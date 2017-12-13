@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "img {\n  width: 400px;\n  display: block;\n  margin: 0 auto;\n}",
+    "created" : 1513085005073.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1968835762",
+    "id" : "F5AB5D83",
+    "lastKnownWriteTime" : 1513085327,
+    "last_content_update" : 1513085327569,
+    "path" : "C:/Users/jestw/Desktop/QBS/QBS Group 2_final/Website/style.css",
+    "project_path" : "style.css",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "css"
+}

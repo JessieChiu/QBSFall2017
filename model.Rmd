@@ -1,0 +1,379 @@
+---
+title: "Model Building"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load Packages
+
+Load all required packages.
+
+```{r library}
+library(readr)
+library(rstan)
+library(rethinking)
+```
+
+## Model 1
+
+### Building Model 1
+
+#### Import Data
+
+Import the Model 1 Dataset.
+
+```{r import.m1}
+# read files
+data1 = read.csv(file.path("datasets", "M1.data.new.csv"))
+```
+
+#### Preprocess Data
+
+```{r pre.m1}
+d1 = data.frame(cbind(data1$Total_cases_Number, data1$Bx1, data1$Bx2, data1$Bx3))
+names(d1) = c("Total_cases_Number","Bx1","Bx2","Bx3") 
+
+d1$crime_cases = (d1$Total_cases_Number - mean(d1$Total_cases_Number))/sd(d1$Total_cases_Number)
+```
+
+#### Build Model
+
+Build Model 1 with map.
+
+```{r m1}
+# Method 1
+m1 <- map(
+  alist(
+    crime_cases ~ dnorm(mu, sigma),
+    mu <- a +b1*Bx1 + b2*Bx2 + b3*Bx3,
+    a ~ dnorm(0,10),
+    b1 ~ dnorm(0,10),
+    b2 ~ dnorm(0,10),
+    b3 ~ dnorm(0,10),
+    sigma ~ dunif(0,10)
+  ),
+  data <- d1,
+  start<-list(a=mean(d1$crime_cases),b1=0,b2=0,b3=0, sigma=sd(d1$crime_cases)))
+```
+
+### Examining Model 1
+
+#### Parameter Overview
+
+From the pairs plot below, we can see that 
+
+```{r m1.pairs}
+pairs(m1)
+```
+
+We then examine the parameter estimates of Model 1.
+
+```{r m1.precis}
+precis(m1)
+```
+
+#### Parameter Effects
+
+The effect of movie types are shown below:
+
+1. Crime-inducing: Bx1
+
+```{r m1.bx1}
+Bx1.seq <- seq(from = 0, to = 10, length.out = 100)
+mu <- link(m1, data = data.frame(Bx1 = Bx1.seq, Bx2 = mean(d1$Bx2), Bx3 = mean(d1$Bx3)))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx1, data = d1)
+lines(Bx1.seq, mu.mean)
+
+shade(mu.PI, Bx1.seq)
+```
+
+2. Crime-reducing: Bx2
+
+```{r m1.bx2}
+Bx2.seq <- seq(from = 0, to = 111, length.out = 100)
+mu <- link(m1, data = data.frame(Bx2 = Bx2.seq, Bx1 = mean(d1$Bx1), Bx3 = mean(d1$Bx3)))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx2, data = d1)
+lines(Bx2.seq, mu.mean)
+
+shade(mu.PI, Bx2.seq)
+```
+
+3. Neutral: Bx3
+
+```{r m1.bx3}
+Bx3.seq <- seq(from = 0, to = 11, length.out = 100)
+mu <- link(m1, data = data.frame(Bx3 = Bx3.seq, Bx1 = mean(d1$Bx1), Bx2 = mean(d1$Bx2)))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx3, data = d1)
+lines(Bx3.seq, mu.mean)
+
+shade(mu.PI, Bx3.seq)
+```
+
+## Model 1 With Stan
+
+### Building Model 1 With Stan
+
+#### Build Model
+
+Build Model 1 with map2stan.
+
+```{r m1.stan}
+# Method 2
+m1.stan <- map2stan( m1, data<-d1, iter = 1e4, warmup = 1000) 
+```
+
+### Examining Model 1 With Stan
+
+#### Parameter Overview
+
+From the pairs plot below, we can see that 
+
+```{r m1.stan.pairs}
+pairs(m1.stan)
+```
+
+We then examine the parameter estimates of Model 1 with Stan.
+
+```{r m1.stan.precis}
+precis(m1.stan)
+```
+
+#### Parameter Effects
+
+The effect of movie types are shown below:
+
+1. Crime-inducing: Bx1
+
+```{r m1.stan.bx1}
+Bx1.seq <- seq(from = 0, to = 10, length.out = 100)
+mu <- link(m1.stan, data = data.frame(Bx1 = Bx1.seq, Bx2 = mean(d1$Bx2), Bx3 = mean(d1$Bx3)))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx1, data = d1)
+lines(Bx1.seq, mu.mean)
+
+shade(mu.PI, Bx1.seq)
+```
+
+2. Crime-reducing: Bx2
+
+```{r m1.stan.bx2}
+Bx2.seq <- seq(from = 0, to = 111, length.out = 100)
+mu <- link(m1.stan, data = data.frame(Bx2 = Bx2.seq, Bx1 = mean(d1$Bx1), Bx3 = mean(d1$Bx3)))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx2, data = d1)
+lines(Bx2.seq, mu.mean)
+
+shade(mu.PI, Bx2.seq)
+```
+
+3. Neutral: Bx3
+
+```{r m1.stan.bx3}
+Bx3.seq <- seq(from = 0, to = 11, length.out = 100)
+mu <- link(m1.stan, data = data.frame(Bx3 = Bx3.seq, Bx1 = mean(d1$Bx1), Bx2 = mean(d1$Bx2)))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx3, data = d1)
+lines(Bx3.seq, mu.mean)
+
+shade(mu.PI, Bx3.seq)
+```
+
+## Model 2
+
+### Building Model 2
+
+#### Import Data
+
+Import the Model 2 Dataset.
+
+```{r import.m2}
+# read files
+data2 = read.csv(file.path("datasets", "M2.data.new.csv"))
+```
+
+#### Preprocess Data
+
+```{r pre.m2}
+box_office = exp(data2$log_box_office)
+std_b = (box_office - mean(box_office))/sd(box_office)
+data2$std_b = std_b
+
+d2 = data.frame(cbind(data2$Total_cases_Number, data2$std_b, data2$score.s, data2$Bscore.s))
+names(d2) = c("Total_cases_Number","std_b","score_s","Bscore_s") 
+
+d2$crime_cases = (d2$Total_cases_Number - mean(d2$Total_cases_Number))/sd(d2$Total_cases_Number)
+```
+
+#### Build Model
+
+Build Model 2 with map.
+
+```{r m2}
+# Method 1
+m2 <- map(
+  alist(
+    crime_cases ~ dnorm(mu, sigma),
+    mu <- a +c1*std_b + c2*score_s + c3*Bscore_s,
+    a ~ dnorm(0,10),
+    c1 ~ dnorm(0,10),
+    c2 ~ dnorm(0,10),
+    c3 ~ dnorm(0,10),
+    sigma ~ dunif(0,10)
+  ),
+  data <- d2,
+  start<-list(a=mean(d2$crime_cases),c1=0,c2=0,c3=0, sigma=sd(d2$crime_cases)))
+```
+
+### Examining Model 2
+
+#### Parameter Overview
+
+From the pairs plot below, we can see that 
+
+```{r m2.pairs}
+pairs(m2)
+```
+
+We then examine the parameter estimates of Model 2.
+
+```{r m2.precis}
+precis(m2)
+```
+
+#### Parameter Effects
+
+The effect of box office results and movie scores are shown below:
+
+1. Box office results: std.b
+
+```{r m2.box}
+std_b.seq <- seq(from = -3, to = 3, length.out = 100)
+mu <- link(m2, data = data.frame(std_b = std_b.seq, score_s = mean(d2$score_s), Bscore_s = mean(d2$Bscore_s)))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ std_b, data = d2)
+lines(std_b.seq, mu.mean)
+
+shade(mu.PI, std_b.seq)
+```
+
+2. Movie scores: score.s
+
+```{r m2.score}
+score_s.seq <- seq(from = -1, to = 1, length.out = 100)
+mu <- link(m2, data = data.frame(score_s = score_s.seq, std_b = mean(d2$std_b), Bscore_s = mean(d2$Bscore_s)))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ score_s, data = d2)
+lines(score_s.seq, mu.mean)
+
+shade(mu.PI, score_s.seq)
+```
+
+3. Interaction between box office results and movie scores:
+
+```{r m2.boxscore}
+Bscore_s.seq <- seq(from = -6, to = 9, length.out = 100)
+mu <- link(m2, data = data.frame(score_s = mean(d2$score_s), std_b = mean(d2$std_b), Bscore_s = Bscore_s.seq))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bscore_s, data = d2)
+lines(Bscore_s.seq, mu.mean)
+
+shade(mu.PI, Bscore_s.seq)
+```
+
+## Model 2 With Stan
+
+### Building Model 2 With Stan
+
+#### Build Model
+
+Build Model 2 with map2stan.
+
+```{r m2.stan}
+# Method 2
+m2.stan <- map2stan( m2, data<-d2, iter = 1e4, warmup = 1000) 
+```
+
+### Examining Model 2 With Stan
+
+#### Parameter Overview
+
+From the pairs plot below, we can see that 
+
+```{r m2.stan.pairs}
+pairs(m2.stan)
+```
+
+We then examine the parameter estimates of Model 2 with Stan.
+
+```{r m2.stan.precis}
+precis(m2.stan)
+```
+
+#### Parameter Effects
+
+The effect of box office results and movie scores are shown below:
+
+1. Box office results: std.b
+
+```{r m2.stan.box}
+std_b.seq <- seq(from = -3, to = 3, length.out = 100)
+mu <- link(m2.stan, data = data.frame(std_b = std_b.seq, score_s = mean(d2$score_s), Bscore_s = mean(d2$Bscore_s)))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ std_b, data = d2)
+lines(std_b.seq, mu.mean)
+
+shade(mu.PI, std_b.seq)
+```
+
+2. Movie scores: score.s
+
+```{r m2.stan.score}
+score_s.seq <- seq(from = -1, to = 1, length.out = 100)
+mu <- link(m2.stan, data = data.frame(score_s = score_s.seq, std_b = mean(d2$std_b), Bscore_s = mean(d2$Bscore_s)))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ score_s, data = d2)
+lines(score_s.seq, mu.mean)
+
+shade(mu.PI, score_s.seq)
+```
+
+3. Interaction between box office results and movie scores:
+
+```{r m2.stan.boxscore}
+Bscore_s.seq <- seq(from = -6, to = 9, length.out = 100)
+mu <- link(m2.stan, data = data.frame(score_s = mean(d2$score_s), std_b = mean(d2$std_b), Bscore_s = Bscore_s.seq))
+mu.mean <- apply(mu, 2, mean)
+mu.PI <- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bscore_s, data = d2)
+lines(Bscore_s.seq, mu.mean)
+
+shade(mu.PI, Bscore_s.seq)
+```

@@ -1,0 +1,92 @@
+---
+title: "Model Comparison"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Compare the previous models.
+
+```{r compare, eval=FALSE}
+d3 <- as.data.frame(cbind(d1,d2$std_b,d2$score_s,d2$Bscore_s))
+names(d3) <-c("Total_cases_Number","Bx1","Bx2","Bx3","crime_cases","std_b","score_s","Bscore_s") 
+
+compare(m1.stan,m2.stan)
+
+prediction.data = data.frame(Bx1 = mean(d3$Bx1), Bx2 = Bx2.seq, Bx3 = mean(d3$Bx3)
+                             , std_b = mean(d3$std_b), score_s = mean(d3$score_s), Bscore_s = mean(d3$Bscore_s))
+
+mu.ensemble <- ensemble(m1.stan, m2.stan, data = prediction.data)
+mu.ensemble.mean <- apply( mu.ensemble$link, 2, mean)
+mu.ensemble.PI <- apply( mu.ensemble$link, 2, PI)
+
+data.plot <- d3
+
+###
+plot(crime_cases ~ Bx2, data=data.plot, col="slateblue",main = "WAIC Model")
+lines( Bx2.seq, mu.ensemble.mean )
+shade(mu.ensemble.PI, Bx2.seq)
+
+
+###
+prediction.data = data.frame(Bx1 = mean(d3$Bx1), Bx2 = mean(d3$Bx2), Bx3 = Bx3.seq
+                             , std_b = mean(d3$std_b), score_s = mean(d3$score_s), Bscore_s = mean(d3$Bscore_s))
+
+mu.ensemble <- ensemble(m1.stan, m2.stan, data = prediction.data)
+mu.ensemble.mean <- apply( mu.ensemble$link, 2, mean)
+mu.ensemble.PI <- apply( mu.ensemble$link, 2, PI)
+
+plot(crime_cases ~ Bx3, data=data.plot, col="slateblue",main = "WAIC Model")
+lines( Bx3.seq, mu.ensemble.mean )
+shade(mu.ensemble.PI, Bx3.seq)
+
+
+###
+prediction.data = data.frame(Bx1 = Bx1.seq, Bx2 = mean(d3$Bx2), Bx3 = mean(d3$Bx3)
+                             , std_b = mean(d3$std_b), score_s = mean(d3$score_s), Bscore_s = mean(d3$Bscore_s))
+
+mu.ensemble <- ensemble(m1.stan, m2.stan, data = prediction.data)
+mu.ensemble.mean <- apply( mu.ensemble$link, 2, mean)
+mu.ensemble.PI <- apply( mu.ensemble$link, 2, PI)
+
+plot(crime_cases ~ Bx1, data=data.plot, col="slateblue",main = "WAIC Model")
+lines( Bx1.seq, mu.ensemble.mean )
+shade(mu.ensemble.PI, Bx1.seq)
+
+###
+prediction.data = data.frame(Bx1 = mean(d3$Bx1), Bx2 = mean(d3$Bx2), Bx3 = mean(d3$Bx3)
+                             , std_b = std_b.seq, score_s = mean(d3$score_s), Bscore_s = mean(d3$Bscore_s))
+
+mu.ensemble <- ensemble(m1.stan, m2.stan, data = prediction.data)
+mu.ensemble.mean <- apply( mu.ensemble$link, 2, mean)
+mu.ensemble.PI <- apply( mu.ensemble$link, 2, PI)
+
+plot(crime_cases ~ std_b, data=data.plot, col="slateblue",main = "WAIC Model")
+lines( std_b.seq, mu.ensemble.mean )
+shade(mu.ensemble.PI, std_b.seq)
+
+###
+prediction.data = data.frame(Bx1 = mean(d3$Bx1), Bx2 = mean(d3$Bx2), Bx3 = mean(d3$Bx3)
+                             , std_b = mean(d3$std_b), score_s = score_s.seq, Bscore_s = mean(d3$Bscore_s))
+
+mu.ensemble <- ensemble(m1.stan, m2.stan, data = prediction.data)
+mu.ensemble.mean <- apply( mu.ensemble$link, 2, mean)
+mu.ensemble.PI <- apply( mu.ensemble$link, 2, PI)
+
+plot(crime_cases ~ score_s, data=data.plot, col="slateblue",main = "WAIC Model")
+lines( score_s.seq, mu.ensemble.mean )
+shade(mu.ensemble.PI, score_s.seq)
+
+###
+prediction.data = data.frame(Bx1 = mean(d3$Bx1), Bx2 = mean(d3$Bx2), Bx3 = mean(d3$Bx3)
+                             , std_b = mean(d3$std_b), score_s = mean(d3$score_s), Bscore_s = Bscore_s.seq)
+
+mu.ensemble <- ensemble(m1.stan, m2.stan, data = prediction.data)
+mu.ensemble.mean <- apply( mu.ensemble$link, 2, mean)
+mu.ensemble.PI <- apply( mu.ensemble$link, 2, PI)
+
+plot(crime_cases ~ Bscore_s, data=data.plot, col="slateblue",main = "WAIC Model")
+lines( Bscore_s.seq, mu.ensemble.mean )
+shade(mu.ensemble.PI, Bscore_s.seq)
+```

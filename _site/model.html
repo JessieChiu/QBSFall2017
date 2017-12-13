@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Model Building</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">QBS Fall 2017 - Group 2</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Introduction</a>
+</li>
+<li>
+  <a href="data.html">Data Mining</a>
+</li>
+<li>
+  <a href="model.html">Model Building</a>
+</li>
+<li>
+  <a href="compare.html">Model Comparison</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Model Building</h1>
+
+</div>
+
+
+<div id="load-packages" class="section level2">
+<h2>Load Packages</h2>
+<p>Load all required packages.</p>
+<pre class="r"><code>library(readr)
+library(rstan)
+library(rethinking)</code></pre>
+</div>
+<div id="model-1" class="section level2">
+<h2>Model 1</h2>
+<div id="building-model-1" class="section level3">
+<h3>Building Model 1</h3>
+<div id="import-data" class="section level4">
+<h4>Import Data</h4>
+<p>Import the Model 1 Dataset.</p>
+<pre class="r"><code># read files
+data1 = read.csv(file.path(&quot;datasets&quot;, &quot;M1.data.new.csv&quot;))</code></pre>
+</div>
+<div id="preprocess-data" class="section level4">
+<h4>Preprocess Data</h4>
+<pre class="r"><code>d1 = data.frame(cbind(data1$Total_cases_Number, data1$Bx1, data1$Bx2, data1$Bx3))
+names(d1) = c(&quot;Total_cases_Number&quot;,&quot;Bx1&quot;,&quot;Bx2&quot;,&quot;Bx3&quot;) 
+
+d1$crime_cases = (d1$Total_cases_Number - mean(d1$Total_cases_Number))/sd(d1$Total_cases_Number)</code></pre>
+</div>
+<div id="build-model" class="section level4">
+<h4>Build Model</h4>
+<p>Build Model 1 with map.</p>
+<pre class="r"><code># Method 1
+m1 &lt;- map(
+  alist(
+    crime_cases ~ dnorm(mu, sigma),
+    mu &lt;- a +b1*Bx1 + b2*Bx2 + b3*Bx3,
+    a ~ dnorm(0,10),
+    b1 ~ dnorm(0,10),
+    b2 ~ dnorm(0,10),
+    b3 ~ dnorm(0,10),
+    sigma ~ dunif(0,10)
+  ),
+  data &lt;- d1,
+  start&lt;-list(a=mean(d1$crime_cases),b1=0,b2=0,b3=0, sigma=sd(d1$crime_cases)))</code></pre>
+</div>
+</div>
+<div id="examining-model-1" class="section level3">
+<h3>Examining Model 1</h3>
+<div id="parameter-overview" class="section level4">
+<h4>Parameter Overview</h4>
+<p>From the pairs plot below, we can see that</p>
+<pre class="r"><code>pairs(m1)</code></pre>
+<p><img src="model_files/figure-html/m1.pairs-1.png" width="672" /></p>
+<p>We then examine the parameter estimates of Model 1.</p>
+<pre class="r"><code>precis(m1)</code></pre>
+<pre><code>##        Mean StdDev   5.5% 94.5%
+## a     -7.88   2.75 -12.28 -3.49
+## b1     0.51   0.16   0.26  0.76
+## b2     0.46   0.16   0.21  0.72
+## b3     0.36   0.16   0.10  0.62
+## sigma  0.82   0.10   0.66  0.99</code></pre>
+</div>
+<div id="parameter-effects" class="section level4">
+<h4>Parameter Effects</h4>
+<p>The effect of movie types are shown below:</p>
+<ol style="list-style-type: decimal">
+<li>Crime-inducing: Bx1</li>
+</ol>
+<pre class="r"><code>Bx1.seq &lt;- seq(from = 0, to = 10, length.out = 100)
+mu &lt;- link(m1, data = data.frame(Bx1 = Bx1.seq, Bx2 = mean(d1$Bx2), Bx3 = mean(d1$Bx3)))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx1, data = d1)
+lines(Bx1.seq, mu.mean)
+
+shade(mu.PI, Bx1.seq)</code></pre>
+<p><img src="model_files/figure-html/m1.bx1-1.png" width="672" /></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Crime-reducing: Bx2</li>
+</ol>
+<pre class="r"><code>Bx2.seq &lt;- seq(from = 0, to = 111, length.out = 100)
+mu &lt;- link(m1, data = data.frame(Bx2 = Bx2.seq, Bx1 = mean(d1$Bx1), Bx3 = mean(d1$Bx3)))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx2, data = d1)
+lines(Bx2.seq, mu.mean)
+
+shade(mu.PI, Bx2.seq)</code></pre>
+<p><img src="model_files/figure-html/m1.bx2-1.png" width="672" /></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Neutral: Bx3</li>
+</ol>
+<pre class="r"><code>Bx3.seq &lt;- seq(from = 0, to = 11, length.out = 100)
+mu &lt;- link(m1, data = data.frame(Bx3 = Bx3.seq, Bx1 = mean(d1$Bx1), Bx2 = mean(d1$Bx2)))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx3, data = d1)
+lines(Bx3.seq, mu.mean)
+
+shade(mu.PI, Bx3.seq)</code></pre>
+<p><img src="model_files/figure-html/m1.bx3-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="model-1-with-stan" class="section level2">
+<h2>Model 1 With Stan</h2>
+<div id="building-model-1-with-stan" class="section level3">
+<h3>Building Model 1 With Stan</h3>
+<div id="build-model-1" class="section level4">
+<h4>Build Model</h4>
+<p>Build Model 1 with map2stan.</p>
+<pre class="r"><code># Method 2
+m1.stan &lt;- map2stan( m1, data&lt;-d1, iter = 1e4, warmup = 1000) </code></pre>
+<pre><code>## recompiling to avoid crashing R session</code></pre>
+<pre><code>## In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/config.hpp:39:0,
+##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/math/tools/config.hpp:13,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/var.hpp:7,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:12,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file2164cb43508.cpp:8:
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
+##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
+##  ^
+## &lt;command-line&gt;:0:0: note: this is the location of the previous definition
+## In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/base.hpp:28:0,
+##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array.hpp:21,
+##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint/util/multi_array_adaption.hpp:29,
+##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint.hpp:61,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr/functor/integrate_ode_rk45.hpp:13,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr.hpp:38,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/mat.hpp:298,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:12,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file2164cb43508.cpp:8:
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function &#39;static void boost::multi_array_concepts::detail::idgen_helper&lt;N&gt;::call(Array&amp;, const IdxGen&amp;, Call_Type)&#39;:
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:42:43: warning: typedef &#39;index_range&#39; locally defined but not used [-Wunused-local-typedefs]
+##        typedef typename Array::index_range index_range;
+##                                            ^
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:43:37: warning: typedef &#39;index&#39; locally defined but not used [-Wunused-local-typedefs]
+##        typedef typename Array::index index;
+##                                      ^
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function &#39;static void boost::multi_array_concepts::detail::idgen_helper&lt;0ull&gt;::call(Array&amp;, const IdxGen&amp;, Call_Type)&#39;:
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:53:43: warning: typedef &#39;index_range&#39; locally defined but not used [-Wunused-local-typedefs]
+##        typedef typename Array::index_range index_range;
+##                                            ^
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:54:37: warning: typedef &#39;index&#39; locally defined but not used [-Wunused-local-typedefs]
+##        typedef typename Array::index index;
+##                                      ^
+## In file included from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:42:0,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file2164cb43508.cpp:8:
+## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp: At global scope:
+## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
+##      static void set_zero_all_adjoints() {
+##                  ^
+## 
+## SAMPLING FOR MODEL &#39;crime_cases ~ dnorm(mu, sigma)&#39; NOW (CHAIN 1).
+## 
+## Gradient evaluation took 0 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## Iteration:    1 / 10000 [  0%]  (Warmup)
+## Iteration: 1000 / 10000 [ 10%]  (Warmup)
+## Iteration: 1001 / 10000 [ 10%]  (Sampling)
+## Iteration: 2000 / 10000 [ 20%]  (Sampling)
+## Iteration: 3000 / 10000 [ 30%]  (Sampling)
+## Iteration: 4000 / 10000 [ 40%]  (Sampling)
+## Iteration: 5000 / 10000 [ 50%]  (Sampling)
+## Iteration: 6000 / 10000 [ 60%]  (Sampling)
+## Iteration: 7000 / 10000 [ 70%]  (Sampling)
+## Iteration: 8000 / 10000 [ 80%]  (Sampling)
+## Iteration: 9000 / 10000 [ 90%]  (Sampling)
+## Iteration: 10000 / 10000 [100%]  (Sampling)
+## 
+##  Elapsed Time: 0.389 seconds (Warm-up)
+##                2.881 seconds (Sampling)
+##                3.27 seconds (Total)
+## 
+## 
+## SAMPLING FOR MODEL &#39;crime_cases ~ dnorm(mu, sigma)&#39; NOW (CHAIN 1).
+## 
+## Gradient evaluation took 0 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## WARNING: No variance estimation is
+##          performed for num_warmup &lt; 20
+## 
+## Iteration: 1 / 1 [100%]  (Sampling)
+## 
+##  Elapsed Time: 0 seconds (Warm-up)
+##                0 seconds (Sampling)
+##                0 seconds (Total)</code></pre>
+<pre><code>## Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
+## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</code></pre>
+<pre><code>## Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
+<pre><code>## Computing WAIC</code></pre>
+<pre><code>## Constructing posterior predictions</code></pre>
+<pre><code>## [ 900 / 9000 ]
+[ 1800 / 9000 ]
+[ 2700 / 9000 ]
+[ 3600 / 9000 ]
+[ 4500 / 9000 ]
+[ 5400 / 9000 ]
+[ 6300 / 9000 ]
+[ 7200 / 9000 ]
+[ 8100 / 9000 ]
+[ 9000 / 9000 ]</code></pre>
+</div>
+</div>
+<div id="examining-model-1-with-stan" class="section level3">
+<h3>Examining Model 1 With Stan</h3>
+<div id="parameter-overview-1" class="section level4">
+<h4>Parameter Overview</h4>
+<p>From the pairs plot below, we can see that</p>
+<pre class="r"><code>pairs(m1.stan)</code></pre>
+<p><img src="model_files/figure-html/m1.stan.pairs-1.png" width="672" /></p>
+<p>We then examine the parameter estimates of Model 1 with Stan.</p>
+<pre class="r"><code>precis(m1.stan)</code></pre>
+<pre><code>##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
+## a     -7.47   3.15     -12.65      -2.57  1548    1
+## b1     0.49   0.18       0.20       0.77  1644    1
+## b2     0.44   0.18       0.14       0.72  1644    1
+## b3     0.34   0.19       0.04       0.64  1674    1
+## sigma  0.93   0.13       0.71       1.12  2684    1</code></pre>
+</div>
+<div id="parameter-effects-1" class="section level4">
+<h4>Parameter Effects</h4>
+<p>The effect of movie types are shown below:</p>
+<ol style="list-style-type: decimal">
+<li>Crime-inducing: Bx1</li>
+</ol>
+<pre class="r"><code>Bx1.seq &lt;- seq(from = 0, to = 10, length.out = 100)
+mu &lt;- link(m1.stan, data = data.frame(Bx1 = Bx1.seq, Bx2 = mean(d1$Bx2), Bx3 = mean(d1$Bx3)))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx1, data = d1)
+lines(Bx1.seq, mu.mean)
+
+shade(mu.PI, Bx1.seq)</code></pre>
+<p><img src="model_files/figure-html/m1.stan.bx1-1.png" width="672" /></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Crime-reducing: Bx2</li>
+</ol>
+<pre class="r"><code>Bx2.seq &lt;- seq(from = 0, to = 111, length.out = 100)
+mu &lt;- link(m1.stan, data = data.frame(Bx2 = Bx2.seq, Bx1 = mean(d1$Bx1), Bx3 = mean(d1$Bx3)))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx2, data = d1)
+lines(Bx2.seq, mu.mean)
+
+shade(mu.PI, Bx2.seq)</code></pre>
+<p><img src="model_files/figure-html/m1.stan.bx2-1.png" width="672" /></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Neutral: Bx3</li>
+</ol>
+<pre class="r"><code>Bx3.seq &lt;- seq(from = 0, to = 11, length.out = 100)
+mu &lt;- link(m1.stan, data = data.frame(Bx3 = Bx3.seq, Bx1 = mean(d1$Bx1), Bx2 = mean(d1$Bx2)))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bx3, data = d1)
+lines(Bx3.seq, mu.mean)
+
+shade(mu.PI, Bx3.seq)</code></pre>
+<p><img src="model_files/figure-html/m1.stan.bx3-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="model-2" class="section level2">
+<h2>Model 2</h2>
+<div id="building-model-2" class="section level3">
+<h3>Building Model 2</h3>
+<div id="import-data-1" class="section level4">
+<h4>Import Data</h4>
+<p>Import the Model 2 Dataset.</p>
+<pre class="r"><code># read files
+data2 = read.csv(file.path(&quot;datasets&quot;, &quot;M2.data.new.csv&quot;))</code></pre>
+</div>
+<div id="preprocess-data-1" class="section level4">
+<h4>Preprocess Data</h4>
+<pre class="r"><code>box_office = exp(data2$log_box_office)
+std_b = (box_office - mean(box_office))/sd(box_office)
+data2$std_b = std_b
+
+d2 = data.frame(cbind(data2$Total_cases_Number, data2$std_b, data2$score.s, data2$Bscore.s))
+names(d2) = c(&quot;Total_cases_Number&quot;,&quot;std_b&quot;,&quot;score_s&quot;,&quot;Bscore_s&quot;) 
+
+d2$crime_cases = (d2$Total_cases_Number - mean(d2$Total_cases_Number))/sd(d2$Total_cases_Number)</code></pre>
+</div>
+<div id="build-model-2" class="section level4">
+<h4>Build Model</h4>
+<p>Build Model 2 with map.</p>
+<pre class="r"><code># Method 1
+m2 &lt;- map(
+  alist(
+    crime_cases ~ dnorm(mu, sigma),
+    mu &lt;- a +c1*std_b + c2*score_s + c3*Bscore_s,
+    a ~ dnorm(0,10),
+    c1 ~ dnorm(0,10),
+    c2 ~ dnorm(0,10),
+    c3 ~ dnorm(0,10),
+    sigma ~ dunif(0,10)
+  ),
+  data &lt;- d2,
+  start&lt;-list(a=mean(d2$crime_cases),c1=0,c2=0,c3=0, sigma=sd(d2$crime_cases)))</code></pre>
+</div>
+</div>
+<div id="examining-model-2" class="section level3">
+<h3>Examining Model 2</h3>
+<div id="parameter-overview-2" class="section level4">
+<h4>Parameter Overview</h4>
+<p>From the pairs plot below, we can see that</p>
+<pre class="r"><code>pairs(m2)</code></pre>
+<p><img src="model_files/figure-html/m2.pairs-1.png" width="672" /></p>
+<p>We then examine the parameter estimates of Model 2.</p>
+<pre class="r"><code>precis(m2)</code></pre>
+<pre><code>##        Mean StdDev   5.5% 94.5%
+## a      0.01   0.17  -0.26  0.27
+## c1     0.21   0.18  -0.08  0.49
+## c2     3.78   9.82 -11.92 19.47
+## c3    -0.30   0.57  -1.21  0.62
+## sigma  0.94   0.12   0.75  1.13</code></pre>
+</div>
+<div id="parameter-effects-2" class="section level4">
+<h4>Parameter Effects</h4>
+<p>The effect of box office results and movie scores are shown below:</p>
+<ol style="list-style-type: decimal">
+<li>Box office results: std.b</li>
+</ol>
+<pre class="r"><code>std_b.seq &lt;- seq(from = -3, to = 3, length.out = 100)
+mu &lt;- link(m2, data = data.frame(std_b = std_b.seq, score_s = mean(d2$score_s), Bscore_s = mean(d2$Bscore_s)))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ std_b, data = d2)
+lines(std_b.seq, mu.mean)
+
+shade(mu.PI, std_b.seq)</code></pre>
+<p><img src="model_files/figure-html/m2.box-1.png" width="672" /></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Movie scores: score.s</li>
+</ol>
+<pre class="r"><code>score_s.seq &lt;- seq(from = -1, to = 1, length.out = 100)
+mu &lt;- link(m2, data = data.frame(score_s = score_s.seq, std_b = mean(d2$std_b), Bscore_s = mean(d2$Bscore_s)))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ score_s, data = d2)
+lines(score_s.seq, mu.mean)
+
+shade(mu.PI, score_s.seq)</code></pre>
+<p><img src="model_files/figure-html/m2.score-1.png" width="672" /></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Interaction between box office results and movie scores:</li>
+</ol>
+<pre class="r"><code>Bscore_s.seq &lt;- seq(from = -6, to = 9, length.out = 100)
+mu &lt;- link(m2, data = data.frame(score_s = mean(d2$score_s), std_b = mean(d2$std_b), Bscore_s = Bscore_s.seq))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bscore_s, data = d2)
+lines(Bscore_s.seq, mu.mean)
+
+shade(mu.PI, Bscore_s.seq)</code></pre>
+<p><img src="model_files/figure-html/m2.boxscore-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="model-2-with-stan" class="section level2">
+<h2>Model 2 With Stan</h2>
+<div id="building-model-2-with-stan" class="section level3">
+<h3>Building Model 2 With Stan</h3>
+<div id="build-model-3" class="section level4">
+<h4>Build Model</h4>
+<p>Build Model 2 with map2stan.</p>
+<pre class="r"><code># Method 2
+m2.stan &lt;- map2stan( m2, data&lt;-d2, iter = 1e4, warmup = 1000) </code></pre>
+<pre><code>## recompiling to avoid crashing R session</code></pre>
+<pre><code>## In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/config.hpp:39:0,
+##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/math/tools/config.hpp:13,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/var.hpp:7,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:12,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file2164438b5b7b.cpp:8:
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
+##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
+##  ^
+## &lt;command-line&gt;:0:0: note: this is the location of the previous definition
+## In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/base.hpp:28:0,
+##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array.hpp:21,
+##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint/util/multi_array_adaption.hpp:29,
+##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint.hpp:61,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr/functor/integrate_ode_rk45.hpp:13,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr.hpp:38,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/mat.hpp:298,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:12,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file2164438b5b7b.cpp:8:
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function &#39;static void boost::multi_array_concepts::detail::idgen_helper&lt;N&gt;::call(Array&amp;, const IdxGen&amp;, Call_Type)&#39;:
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:42:43: warning: typedef &#39;index_range&#39; locally defined but not used [-Wunused-local-typedefs]
+##        typedef typename Array::index_range index_range;
+##                                            ^
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:43:37: warning: typedef &#39;index&#39; locally defined but not used [-Wunused-local-typedefs]
+##        typedef typename Array::index index;
+##                                      ^
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function &#39;static void boost::multi_array_concepts::detail::idgen_helper&lt;0ull&gt;::call(Array&amp;, const IdxGen&amp;, Call_Type)&#39;:
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:53:43: warning: typedef &#39;index_range&#39; locally defined but not used [-Wunused-local-typedefs]
+##        typedef typename Array::index_range index_range;
+##                                            ^
+## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:54:37: warning: typedef &#39;index&#39; locally defined but not used [-Wunused-local-typedefs]
+##        typedef typename Array::index index;
+##                                      ^
+## In file included from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:42:0,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+##                  from file2164438b5b7b.cpp:8:
+## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp: At global scope:
+## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
+##      static void set_zero_all_adjoints() {
+##                  ^
+## 
+## SAMPLING FOR MODEL &#39;crime_cases ~ dnorm(mu, sigma)&#39; NOW (CHAIN 1).
+## 
+## Gradient evaluation took 0 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## Iteration:    1 / 10000 [  0%]  (Warmup)
+## Iteration: 1000 / 10000 [ 10%]  (Warmup)
+## Iteration: 1001 / 10000 [ 10%]  (Sampling)
+## Iteration: 2000 / 10000 [ 20%]  (Sampling)
+## Iteration: 3000 / 10000 [ 30%]  (Sampling)
+## Iteration: 4000 / 10000 [ 40%]  (Sampling)
+## Iteration: 5000 / 10000 [ 50%]  (Sampling)
+## Iteration: 6000 / 10000 [ 60%]  (Sampling)
+## Iteration: 7000 / 10000 [ 70%]  (Sampling)
+## Iteration: 8000 / 10000 [ 80%]  (Sampling)
+## Iteration: 9000 / 10000 [ 90%]  (Sampling)
+## Iteration: 10000 / 10000 [100%]  (Sampling)
+## 
+##  Elapsed Time: 0.513 seconds (Warm-up)
+##                2.775 seconds (Sampling)
+##                3.288 seconds (Total)
+## 
+## 
+## SAMPLING FOR MODEL &#39;crime_cases ~ dnorm(mu, sigma)&#39; NOW (CHAIN 1).
+## 
+## Gradient evaluation took 0 seconds
+## 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+## Adjust your expectations accordingly!
+## 
+## 
+## WARNING: No variance estimation is
+##          performed for num_warmup &lt; 20
+## 
+## Iteration: 1 / 1 [100%]  (Sampling)
+## 
+##  Elapsed Time: 0 seconds (Warm-up)
+##                0 seconds (Sampling)
+##                0 seconds (Total)</code></pre>
+<pre><code>## Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
+## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</code></pre>
+<pre><code>## Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
+<pre><code>## Computing WAIC</code></pre>
+<pre><code>## Constructing posterior predictions</code></pre>
+<pre><code>## [ 900 / 9000 ]
+[ 1800 / 9000 ]
+[ 2700 / 9000 ]
+[ 3600 / 9000 ]
+[ 4500 / 9000 ]
+[ 5400 / 9000 ]
+[ 6300 / 9000 ]
+[ 7200 / 9000 ]
+[ 8100 / 9000 ]
+[ 9000 / 9000 ]</code></pre>
+</div>
+</div>
+<div id="examining-model-2-with-stan" class="section level3">
+<h3>Examining Model 2 With Stan</h3>
+<div id="parameter-overview-3" class="section level4">
+<h4>Parameter Overview</h4>
+<p>From the pairs plot below, we can see that</p>
+<pre class="r"><code>pairs(m2.stan)</code></pre>
+<p><img src="model_files/figure-html/m2.stan.pairs-1.png" width="672" /></p>
+<p>We then examine the parameter estimates of Model 2 with Stan.</p>
+<pre class="r"><code>precis(m2.stan)</code></pre>
+<pre><code>##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
+## a      0.01   0.18      -0.29       0.30  6912    1
+## c1     0.21   0.20      -0.09       0.53  8174    1
+## c2     3.20   9.64     -11.94      18.89  4624    1
+## c3    -0.26   0.56      -1.17       0.62  4635    1
+## sigma  1.03   0.14       0.80       1.23  5398    1</code></pre>
+</div>
+<div id="parameter-effects-3" class="section level4">
+<h4>Parameter Effects</h4>
+<p>The effect of box office results and movie scores are shown below:</p>
+<ol style="list-style-type: decimal">
+<li>Box office results: std.b</li>
+</ol>
+<pre class="r"><code>std_b.seq &lt;- seq(from = -3, to = 3, length.out = 100)
+mu &lt;- link(m2.stan, data = data.frame(std_b = std_b.seq, score_s = mean(d2$score_s), Bscore_s = mean(d2$Bscore_s)))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ std_b, data = d2)
+lines(std_b.seq, mu.mean)
+
+shade(mu.PI, std_b.seq)</code></pre>
+<p><img src="model_files/figure-html/m2.stan.box-1.png" width="672" /></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Movie scores: score.s</li>
+</ol>
+<pre class="r"><code>score_s.seq &lt;- seq(from = -1, to = 1, length.out = 100)
+mu &lt;- link(m2.stan, data = data.frame(score_s = score_s.seq, std_b = mean(d2$std_b), Bscore_s = mean(d2$Bscore_s)))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ score_s, data = d2)
+lines(score_s.seq, mu.mean)
+
+shade(mu.PI, score_s.seq)</code></pre>
+<p><img src="model_files/figure-html/m2.stan.score-1.png" width="672" /></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Interaction between box office results and movie scores:</li>
+</ol>
+<pre class="r"><code>Bscore_s.seq &lt;- seq(from = -6, to = 9, length.out = 100)
+mu &lt;- link(m2.stan, data = data.frame(score_s = mean(d2$score_s), std_b = mean(d2$std_b), Bscore_s = Bscore_s.seq))</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
+mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
+
+plot(crime_cases ~ Bscore_s, data = d2)
+lines(Bscore_s.seq, mu.mean)
+
+shade(mu.PI, Bscore_s.seq)</code></pre>
+<p><img src="model_files/figure-html/m2.stan.boxscore-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

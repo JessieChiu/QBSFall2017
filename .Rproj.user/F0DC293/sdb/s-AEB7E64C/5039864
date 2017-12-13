@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "name: final-project\nnavbar:\n  title: QBS Fall 2017 - Group 2\n  left:\n  - text: Introduction\n    href: index.html\n  - text: Data Mining\n    href: data.html\n  - text: Model Building\n    href: model.html\n  - text: Model Comparison\n    href: compare.html\noutput:\n  html_document:\n    toc: yes\n    toc_depth: 3\n    toc_float: yes\n    theme: flatly\n    css: style.css\n    lib_dir: site_libs\n    self_contained: no\noutput_dir: _site\n\n",
+    "created" : 1513065094561.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2240009016",
+    "id" : "5039864",
+    "lastKnownWriteTime" : 1513152273,
+    "last_content_update" : 1513152273,
+    "path" : "C:/Users/jestw/Desktop/QBS/QBS Group 2_final/Website/_site.yml",
+    "project_path" : "_site.yml",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "yaml"
+}
