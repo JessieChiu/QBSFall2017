@@ -54,7 +54,7 @@ data$Imbd = as.numeric(data$Imbd)
 # convert box office to log for better comparison
 data$log_box_office = log(data$box_office)
 
-# compute mean score and overwriting NA values
+# compute mean score and overwrite NA values
 A = (data$rotten_tomatoes + data$Imbd)/2
 B = data$Imbd
 data$score = ifelse(!is.na(data$rotten_tomatoes), A, B)
@@ -153,4 +153,16 @@ extract.data = data %>%
 extract.data = merge(Y, extract.data, by=c("year","Quarter"))
 
 write.csv(extract.data, "M2.data.new.csv")
+```
+
+We also combine the two datasets above for a complete dataset, which will later be used in the Shiny document.
+
+```{r complete, eval=FALSE}
+# Complete Data:
+M1 = read.csv("M1.data.new.csv")
+M2 = read.csv("M2.data.new.csv")
+
+complete.data = merge(M1,M2)
+
+write.csv(complete.data, "Data.csv")
 ```

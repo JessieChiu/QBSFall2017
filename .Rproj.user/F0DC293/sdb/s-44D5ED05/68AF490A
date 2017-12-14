@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(DT)\nlibrary(shiny)\nlibrary(shinythemes)\nlibrary(dplyr)\nlibrary(readr)\nlibrary(ggplot2)\n\nshinyUI\n  navbarPage(\"QBS Group 2\", \n    tabPanel(\"About\", h1(\"The Link between Crime Cases and Movies\"), img(src=\"crimefilms.jpg\", height = 400, width = 600, align = \"center\"),\n             sidebarPanel(h3(\"How the movies influence people?\"), h4(\"Dependant variable: Crime cases\"), h4(\"Predictor variables: Types of movies, Box office, and IMDb scores\"))\n             ),\n    tabPanel(\"Dataset\", h1(\"Number of Crime Cases by Year in Taiwan\"), helpText(\"Note: There is a decrease in crime cases in Taiwan.\"), \n             plotOutput(\"barPlot\"), DT::dataTableOutput(\"mytable\")\n             ),\n    tabPanel(\"Model 1\", \n             sidebarPanel(\n               selectInput(\"select\", label = h3(\"Select variables\"), c(\"Bx1\", \"Bx2\", \"Bx3\"), selected = \"Bx1\"), helpText(\"Note: Y = crime cases. Bx1 = crime-induced movies. Bx2 = noncrime-induced movies. Bx3 = other movies.\")),\n             mainPanel(plotOutput(\"plot1\"), verbatimTextOutput(\"summary1\"), verbatimTextOutput(\"summary1_1\")\n                       )), \n    tabPanel(\"Model 2\", \n             sidebarPanel(\n               selectInput(\"select2\", label = h3(\"Select variables\"), c(\"box_office\", \"score.s\", \"Bscore.s\"), selected = \"box_office\"), helpText(\"Note: Y = crime cases.\")),\n             mainPanel(plotOutput(\"plot2\"), verbatimTextOutput(\"summary2\"), verbatimTextOutput(\"summary2_1\"))\n    \n    )\n    )\n  \n                \n\n\n             \n                \n\n",
+    "created" : 1513177326725.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1264149171",
+    "id" : "68AF490A",
+    "lastKnownWriteTime" : 1513150586,
+    "last_content_update" : 1513150586,
+    "path" : "C:/Users/jestw/Desktop/QBS/QBS Group 2_final/Shiny/ui.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

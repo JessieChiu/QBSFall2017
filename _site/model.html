@@ -288,6 +288,7 @@ div.tocify {
 <li>
   <a href="compare.html">Model Comparison</a>
 </li>
+<li class="dropdown-header">Shiny App</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -456,7 +457,7 @@ m1.stan &lt;- map2stan( m1, data&lt;-d1, iter = 1e4, warmup = 1000) </code></pre
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file2164cb43508.cpp:8:
+##                  from file2164470f1117.cpp:8:
 ## C:/Program Files/R/R-3.3.3/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
 ##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
 ##  ^
@@ -471,7 +472,7 @@ m1.stan &lt;- map2stan( m1, data&lt;-d1, iter = 1e4, warmup = 1000) </code></pre
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:12,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file2164cb43508.cpp:8:
+##                  from file2164470f1117.cpp:8:
 ## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function &#39;static void boost::multi_array_concepts::detail::idgen_helper&lt;N&gt;::call(Array&amp;, const IdxGen&amp;, Call_Type)&#39;:
 ## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:42:43: warning: typedef &#39;index_range&#39; locally defined but not used [-Wunused-local-typedefs]
 ##        typedef typename Array::index_range index_range;
@@ -490,7 +491,7 @@ m1.stan &lt;- map2stan( m1, data&lt;-d1, iter = 1e4, warmup = 1000) </code></pre
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file2164cb43508.cpp:8:
+##                  from file2164470f1117.cpp:8:
 ## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp: At global scope:
 ## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
 ##      static void set_zero_all_adjoints() {
@@ -516,9 +517,9 @@ m1.stan &lt;- map2stan( m1, data&lt;-d1, iter = 1e4, warmup = 1000) </code></pre
 ## Iteration: 9000 / 10000 [ 90%]  (Sampling)
 ## Iteration: 10000 / 10000 [100%]  (Sampling)
 ## 
-##  Elapsed Time: 0.389 seconds (Warm-up)
-##                2.881 seconds (Sampling)
-##                3.27 seconds (Total)
+##  Elapsed Time: 0.559 seconds (Warm-up)
+##                3.573 seconds (Sampling)
+##                4.132 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL &#39;crime_cases ~ dnorm(mu, sigma)&#39; NOW (CHAIN 1).
@@ -563,11 +564,11 @@ m1.stan &lt;- map2stan( m1, data&lt;-d1, iter = 1e4, warmup = 1000) </code></pre
 <p>We then examine the parameter estimates of Model 1 with Stan.</p>
 <pre class="r"><code>precis(m1.stan)</code></pre>
 <pre><code>##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a     -7.47   3.15     -12.65      -2.57  1548    1
-## b1     0.49   0.18       0.20       0.77  1644    1
-## b2     0.44   0.18       0.14       0.72  1644    1
-## b3     0.34   0.19       0.04       0.64  1674    1
-## sigma  0.93   0.13       0.71       1.12  2684    1</code></pre>
+## a     -7.80   2.99     -12.74      -3.30  1674    1
+## b1     0.51   0.17       0.25       0.78  1806    1
+## b2     0.46   0.17       0.19       0.74  1778    1
+## b3     0.36   0.18       0.08       0.64  1779    1
+## sigma  0.92   0.13       0.71       1.11  2264    1</code></pre>
 </div>
 <div id="parameter-effects-1" class="section level4">
 <h4>Parameter Effects</h4>
@@ -792,7 +793,7 @@ m2.stan &lt;- map2stan( m2, data&lt;-d2, iter = 1e4, warmup = 1000) </code></pre
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file2164438b5b7b.cpp:8:
+##                  from file21645dbb618a.cpp:8:
 ## C:/Program Files/R/R-3.3.3/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
 ##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
 ##  ^
@@ -807,7 +808,7 @@ m2.stan &lt;- map2stan( m2, data&lt;-d2, iter = 1e4, warmup = 1000) </code></pre
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:12,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file2164438b5b7b.cpp:8:
+##                  from file21645dbb618a.cpp:8:
 ## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function &#39;static void boost::multi_array_concepts::detail::idgen_helper&lt;N&gt;::call(Array&amp;, const IdxGen&amp;, Call_Type)&#39;:
 ## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:42:43: warning: typedef &#39;index_range&#39; locally defined but not used [-Wunused-local-typedefs]
 ##        typedef typename Array::index_range index_range;
@@ -826,7 +827,7 @@ m2.stan &lt;- map2stan( m2, data&lt;-d2, iter = 1e4, warmup = 1000) </code></pre
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
 ##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file2164438b5b7b.cpp:8:
+##                  from file21645dbb618a.cpp:8:
 ## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp: At global scope:
 ## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
 ##      static void set_zero_all_adjoints() {
@@ -852,9 +853,9 @@ m2.stan &lt;- map2stan( m2, data&lt;-d2, iter = 1e4, warmup = 1000) </code></pre
 ## Iteration: 9000 / 10000 [ 90%]  (Sampling)
 ## Iteration: 10000 / 10000 [100%]  (Sampling)
 ## 
-##  Elapsed Time: 0.513 seconds (Warm-up)
-##                2.775 seconds (Sampling)
-##                3.288 seconds (Total)
+##  Elapsed Time: 0.359 seconds (Warm-up)
+##                3.272 seconds (Sampling)
+##                3.631 seconds (Total)
 ## 
 ## 
 ## SAMPLING FOR MODEL &#39;crime_cases ~ dnorm(mu, sigma)&#39; NOW (CHAIN 1).
@@ -899,11 +900,11 @@ m2.stan &lt;- map2stan( m2, data&lt;-d2, iter = 1e4, warmup = 1000) </code></pre
 <p>We then examine the parameter estimates of Model 2 with Stan.</p>
 <pre class="r"><code>precis(m2.stan)</code></pre>
 <pre><code>##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a      0.01   0.18      -0.29       0.30  6912    1
-## c1     0.21   0.20      -0.09       0.53  8174    1
-## c2     3.20   9.64     -11.94      18.89  4624    1
-## c3    -0.26   0.56      -1.17       0.62  4635    1
-## sigma  1.03   0.14       0.80       1.23  5398    1</code></pre>
+## a      0.01   0.18      -0.30       0.29  6302    1
+## c1     0.21   0.21      -0.13       0.52  6177    1
+## c2     3.29   9.80     -12.97      18.40  4430    1
+## c3    -0.27   0.57      -1.17       0.66  4429    1
+## sigma  1.04   0.14       0.82       1.27  4532    1</code></pre>
 </div>
 <div id="parameter-effects-3" class="section level4">
 <h4>Parameter Effects</h4>
