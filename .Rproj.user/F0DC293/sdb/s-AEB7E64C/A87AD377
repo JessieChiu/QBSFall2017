@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "Sys.setenv(TZ=\"Asia/Shanghai\")\nlibrary(DT)\nlibrary(shiny)\nlibrary(shinythemes)\nlibrary(dplyr)\nlibrary(readr)\nlibrary(ggplot2)\n#Loading the Data\ncrime <- read.csv(\"/Users/jestw/Desktop/QBS/QBS Group 2_final/Data.csv\"\n                   , col_types = cols(year= col_number(), quarter= col_number(), crime_cases= col_number(), Bx1= col_number(), Bx2= col_number(), Bx3= col_number(), box_office= col_number(), score.s= col_number(),Bscore.s= col_number()))\n\n# Define a server for the Shiny app\nfunction(input, output){\n  \n# Fill in the spot we created for a plot\n  output$barPlot <- renderPlot({\n    ggplot(data=crime, aes(x=Year, y=crime_cases)) + geom_bar(stat=\"identity\") + \n      labs(x=\"Year\", y=\"Number of Crime cases\")}, height = 400, width = 700)\n  output$plot1 <- renderPlot({\n  if(input$select == \"Bx1\"){plot(x = crime$Bx1, y = crime$crime_cases, xlab = \"Bx1\", ylab = \"Crime cases\", col=\"blue\", main = \"Crime cases v.s. Bx1\") + abline(lm(crime$crime_cases ~ crime$Bx1))}\n  if(input$select == \"Bx2\"){plot(x = crime$Bx2, y = crime$crime_cases, xlab = \"Bx2\", ylab = \"Crime cases\", col=\"blue\", main = \"Crime cases v.s. Bx2\") + abline(lm(crime$crime_cases ~ crime$Bx2))}\n  if(input$select == \"Bx3\"){plot(x = crime$Bx3, y = crime$crime_cases, xlab = \"Bx3\", ylab = \"Crime cases\", col=\"blue\", main = \"Crime cases v.s. Bx3\") + abline(lm(crime$crime_cases ~ crime$Bx3))}\n  output$summary1 <- renderPrint({summary(lm(crime_cases~ Bx1 + Bx2 + Bx3, data=crime, x=T))})\n  output$summary1_1 <- renderPrint({\n    d1 <- crime[-c(1,2,7,8,9)]\n    summary(d1)})\n  \n  output$plot2 <- renderPlot({\n    if(input$select2 == \"box_office\"){plot(x = crime$box_office, y = crime$crime_cases, xlab = \"Box-office\", ylab = \"Crime cases\", col=\"blue\", main = \"Crime cases v.s. Box-office\") + abline(lm(crime$crime_cases ~ crime$box_office))}\n    if(input$select2 == \"score.s\"){plot(x = crime$score.s, y = crime$crime_cases, xlab = \"Score.s\", ylab = \"Crime cases\", col=\"blue\", main = \"Crime cases v.s. Score.s\") + abline(lm(crime$crime_cases ~ crime$score.s))}\n    if(input$select2 == \"Bscore.s\"){plot(x = crime$Bx3, y = crime$crime_cases, xlab = \"Bscore.s\", ylab = \"Crime cases\", col=\"blue\", main = \"Crime cases v.s. Bscore.s\") + abline(lm(crime$crime_cases ~ crime$Bscore.s))}\n  output$summary2 <- renderPrint({summary(lm(crime_cases~ box_office + score.s + Bscore.s, data=crime, x=T))})\n  output$summary2_1 <- renderPrint({\n      d2 <- crime[-c(1,2,4,5,6)]\n      summary(d2)})\n  \n  output$mytable <- DT::renderDataTable({\n      DT::datatable(crime)\n    \n  })\n  })   \n  })\n    }\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n  \n  \n  \n        \n        \n        \n  \n  \n  \n    \n  \n  \n  \n    \n    \n    \n  \n  \n  \n\n\n\n\n  \n  \n    \n    \n  \n\n",
+    "created" : 1513311166064.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3148571010",
+    "id" : "A87AD377",
+    "lastKnownWriteTime" : 1513175964,
+    "last_content_update" : 1513175964,
+    "path" : "C:/Users/jestw/Desktop/QBS/QBS Group 2_final/Shiny/server.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

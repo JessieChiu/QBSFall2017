@@ -1,0 +1,4 @@
+"0","# compare models "
+"0","compare(m1.stan, m2.stan) "
+"2","Error in compare(m1.stan, m2.stan) : object 'm1.stan' not found
+"

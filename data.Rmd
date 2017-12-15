@@ -10,30 +10,51 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Load all required packages.
 
-```{r library, eval=FALSE}
+```{r library, include=FALSE}
 require("xml2")
 library('rvest')
 library('NLP')
 library('tm')
 library('stringr')
 library('dplyr')
+library("DT")
 ```
 
 ## Import Data
 
 Import the datasets of *Taipei's Top 15 Movies From 2008-2015 (by quarter)* and combine.
 
-```{r import, eval=FALSE}
+```{r import}
 # read files
-Q1 = read.csv("QBS-Q1-data-new.csv")
-Q2 = read.csv("QBS-Q2-data-new.csv")
-Q3 = read.csv("QBS-Q3-data-new.csv")
-Q4 = read.csv("QBS-Q4-data-new.csv")
-Y = read.csv("Crime-Rate.csv")
+Q1 = read.csv(file.path("datasets", "QBS-Q1-data-new.csv"))
+Q2 = read.csv(file.path("datasets", "QBS-Q2-data-new.csv"))
+Q3 = read.csv(file.path("datasets", "QBS-Q3-data-new.csv"))
+Q4 = read.csv(file.path("datasets", "QBS-Q4-data-new.csv"))
+Y = read.csv(file.path("datasets", "Crime-Rate.csv"))
 
 # combine datasets
 data = rbind(Q1,Q2,Q3,Q4)
+
+DT:::datatable(
+    data,
+    extensions = list("Scroller" = NULL,
+                      'FixedHeader' = NULL,
+                      "FixedColumns" = list(leftColumns=4)),
+    options = list(
+                deferRender = TRUE,
+                scrollY = 200,
+                scroller = TRUE,
+                autoWidth=TRUE,
+                pageLength = 50,
+                fixedHeader = TRUE,
+                dom = 't',
+                scrollX = TRUE,
+                fixedColumns = list(leftColumns = 4)
+                  )
+              )
 ```
+
+.
 
 ## Preprocess Data
 
@@ -45,7 +66,7 @@ Step 3 : Since many Rotten Tomatoes scores are missing, we decided to overwrite 
 
 Step 4 : Standardize scores for better comparison.
 
-```{r pre, eval=FALSE}
+```{r pre}
 # convert factor to numeric
 data$box_office = as.numeric(data$box_office)
 data$rotten_tomatoes = as.numeric(data$rotten_tomatoes)
@@ -64,12 +85,32 @@ data = data[complete.cases(data[ , 8:9]), ]
 
 # standardize score
 data$score.s = (data$score - mean(data$score))/sd(data$score)
+
+DT:::datatable(
+    data,
+    extensions = list("Scroller" = NULL,
+                      'FixedHeader' = NULL,
+                      "FixedColumns" = list(leftColumns=4)),
+    options = list(
+                deferRender = TRUE,
+                scrollY = 200,
+                scroller = TRUE,
+                autoWidth=TRUE,
+                pageLength = 50,
+                fixedHeader = TRUE,
+                dom = 't',
+                scrollX = TRUE,
+                fixedColumns = list(leftColumns = 4)
+                  )
+              )
 ```
+
+.
 
 Since the variable **category** consists of jumbles of genres, we must apply text mining techniques to derive information.
 The process of transforming and cleaning text data is shown below.
 
-```{r tm, eval=FALSE}
+```{r tm}
 category <- data$category
 corpus <- Corpus(VectorSource(category))
 
@@ -82,7 +123,27 @@ corpus2 <- tm_map(corpus2, stripWhitespace)
 corpus2 = sapply(corpus2, as.character)
 
 data$category =as.factor(corpus2)
+
+DT:::datatable(
+    data,
+    extensions = list("Scroller" = NULL,
+                      'FixedHeader' = NULL,
+                      "FixedColumns" = list(leftColumns=4)),
+    options = list(
+                deferRender = TRUE,
+                scrollY = 200,
+                scroller = TRUE,
+                autoWidth=TRUE,
+                pageLength = 50,
+                fixedHeader = TRUE,
+                dom = 't',
+                scrollX = TRUE,
+                fixedColumns = list(leftColumns = 4)
+                  )
+              )
 ```
+
+.
 
 ## Define Variables
 
@@ -96,7 +157,7 @@ Their corresponding genres are as follows:
 
 3. Neutral: these are the genres that fall in neither category.
 
-```{r var, eval=FALSE}
+```{r var}
 # determine x1=number of crime-inducing movies
 x1 = c("crime","thriller","horror","mystery","suspense")
 x1 = paste(x1, collapse='|')
@@ -123,7 +184,27 @@ for(i in 1:481){
 
 # determine x3=number of neutral movies
 data$x3 = ifelse(data$x1 +data$x2 == 0, 1, 0)
+
+DT:::datatable(
+    data,
+    extensions = list("Scroller" = NULL,
+                      'FixedHeader' = NULL,
+                      "FixedColumns" = list(leftColumns=4)),
+    options = list(
+                deferRender = TRUE,
+                scrollY = 200,
+                scroller = TRUE,
+                autoWidth=TRUE,
+                pageLength = 50,
+                fixedHeader = TRUE,
+                dom = 't',
+                scrollX = TRUE,
+                fixedColumns = list(leftColumns = 4)
+                  )
+              )
 ```
+
+.
 
 ## Assign to Datasets
 

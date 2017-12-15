@@ -306,87 +306,199 @@ div.tocify {
 </div>
 
 
-<p>Compare the previous models.</p>
-<pre class="r"><code>d3 &lt;- as.data.frame(cbind(d1,d2$std_b,d2$score_s,d2$Bscore_s))
-names(d3) &lt;-c(&quot;Total_cases_Number&quot;,&quot;Bx1&quot;,&quot;Bx2&quot;,&quot;Bx3&quot;,&quot;crime_cases&quot;,&quot;std_b&quot;,&quot;score_s&quot;,&quot;Bscore_s&quot;) 
+<div id="import-values" class="section level2">
+<h2>Import Values</h2>
+<p>Import values computed from Model Building .</p>
+<pre class="r"><code># read files
+source(file.path(&quot;datasets&quot;, &quot;model.R&quot;))</code></pre>
+</div>
+<div id="model-comparison" class="section level2">
+<h2>Model Comparison</h2>
+<p>It is not apparent which is the better model, since the model weights are approximately the same.</p>
+<p>We can conclude that <strong>the effect of movie type</strong> is as significant as a predictor as <strong>the effect of box office results</strong> and <strong>the effect of movie scores</strong> on <strong>crime rates</strong>.</p>
+<pre class="r"><code># compare models 
+compare(m1, m2) </code></pre>
+<pre><code>##     WAIC pWAIC dWAIC weight    SE  dSE
+## m1 -33.1   6.1   0.0   0.63 10.72   NA
+## m2 -32.0   4.5   1.1   0.37 10.79 9.42</code></pre>
+</div>
+<div id="model-averaging" class="section level2">
+<h2>Model Averaging</h2>
+<p>Merge datasets d1 and d2 to create prediction data.</p>
+<pre class="r"><code># combine d1, d2
+d = merge(d1,d2)</code></pre>
+<div id="model-1" class="section level3">
+<h3>Model 1</h3>
+<p>Find significant predictors of Model 1 with summary. As shown below, predictor <strong>Bx1_c</strong> is the most significant, and hence we will examine <strong>the effect of movie type - “Crime-inducing”</strong> on <strong>log crime cases</strong>.</p>
+<pre class="r"><code>summary(lm(log_crime~ Bx1_c + Bx2_c + Bx3_c, data=d1, x=T))</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = log_crime ~ Bx1_c + Bx2_c + Bx3_c, data = d1, x = T)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.247296 -0.092399 -0.009366  0.049547  0.298875 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 11.360622   0.022414 506.863   &lt;2e-16 ***
+## Bx1_c       -0.033509   0.025013  -1.340   0.1911    
+## Bx2_c       -0.009411   0.025216  -0.373   0.7118    
+## Bx3_c       -0.056353   0.026329  -2.140   0.0412 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1268 on 28 degrees of freedom
+## Multiple R-squared:  0.3669, Adjusted R-squared:  0.299 
+## F-statistic: 5.408 on 3 and 28 DF,  p-value: 0.004604</code></pre>
+<p>Plot the model-averaged predictions of this model set.</p>
+<pre class="r"><code># Model 1
+Bx1_c.seq &lt;- seq(from=-5.5, to=4, length.out = 30)
+d.predict &lt;- list(
+  log_crime = rep(0,30),
+  Bx1_c = Bx1_c.seq,
+  Bx2_c = rep(0,30),
+  Bx3_c = rep(0,30),
+  log_box_office = rep(0,30),
+  score.s = rep(0,30),
+  Bscore.s = rep(0,30)
+)
 
-compare(m1.stan,m2.stan)
+  pred.m &lt;- link( m1 , data=d.predict )</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>  mu &lt;- apply( pred.m , 2 , mean )
+  mu.PI &lt;- apply( pred.m , 2 , PI )
+  
+  plot( log_crime ~ Bx1_c , d , col=rangi2 )
+  lines( Bx1_c.seq , mu , lty=2 )
+  lines( Bx1_c.seq, mu.PI[1,] , lty=2 )
+  lines( Bx1_c.seq , mu.PI[2,] , lty=2 )
+  
+  log_crime.ensemble &lt;- ensemble( m1 , m2 ,data=d.predict )</code></pre>
+<pre><code>## Constructing posterior predictions</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre><code>## Constructing posterior predictions</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>  mu &lt;- apply( log_crime.ensemble$link , 2 , mean )
+  mu.PI &lt;- apply( log_crime.ensemble$link , 2 , PI )
+  lines( Bx1_c.seq , mu )
+  shade( mu.PI , Bx1_c.seq )</code></pre>
+<p><img src="compare_files/figure-html/m1.average-1.png" width="672" /></p>
+</div>
+<div id="model-2" class="section level3">
+<h3>Model 2</h3>
+<p>Find significant predictors of Model 2 with summary. As shown below, predictor <strong>log_box_office</strong> is the most significant, and hence we will examine <strong>the effect of log box office results</strong> on <strong>log crime cases</strong>.</p>
+<pre class="r"><code>summary(lm(log_crime~ log_box_office + score.s + Bscore.s, data=d2, x=T))</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = log_crime ~ log_box_office + score.s + Bscore.s, 
+##     data = d2, x = T)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.23284 -0.08889 -0.00420  0.07127  0.35327 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    15.29620    1.66635   9.179 6.15e-10 ***
+## log_box_office -0.22799    0.09635  -2.366   0.0251 *  
+## score.s        -4.17023    7.02684  -0.593   0.5576    
+## Bscore.s        0.23202    0.40650   0.571   0.5727    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.134 on 28 degrees of freedom
+## Multiple R-squared:  0.2928, Adjusted R-squared:  0.217 
+## F-statistic: 3.863 on 3 and 28 DF,  p-value: 0.01976</code></pre>
+<p>Plot the model-averaged predictions of this model set.</p>
+<pre class="r"><code># Model 2
+log_box_office.seq &lt;- seq(from=16, to=18, length.out = 30)
+d.predict &lt;- list(
+  log_crime = rep(0,30),
+  Bx1_c = rep(0,30),
+  Bx2_c = rep(0,30),
+  Bx3_c = rep(0,30),
+  log_box_office = log_box_office.seq,
+  score.s = rep(0,30),
+  Bscore.s = rep(0,30)
+)
 
-prediction.data = data.frame(Bx1 = mean(d3$Bx1), Bx2 = Bx2.seq, Bx3 = mean(d3$Bx3)
-                             , std_b = mean(d3$std_b), score_s = mean(d3$score_s), Bscore_s = mean(d3$Bscore_s))
-
-mu.ensemble &lt;- ensemble(m1.stan, m2.stan, data = prediction.data)
-mu.ensemble.mean &lt;- apply( mu.ensemble$link, 2, mean)
-mu.ensemble.PI &lt;- apply( mu.ensemble$link, 2, PI)
-
-data.plot &lt;- d3
-
-###
-plot(crime_cases ~ Bx2, data=data.plot, col=&quot;slateblue&quot;,main = &quot;WAIC Model&quot;)
-lines( Bx2.seq, mu.ensemble.mean )
-shade(mu.ensemble.PI, Bx2.seq)
-
-
-###
-prediction.data = data.frame(Bx1 = mean(d3$Bx1), Bx2 = mean(d3$Bx2), Bx3 = Bx3.seq
-                             , std_b = mean(d3$std_b), score_s = mean(d3$score_s), Bscore_s = mean(d3$Bscore_s))
-
-mu.ensemble &lt;- ensemble(m1.stan, m2.stan, data = prediction.data)
-mu.ensemble.mean &lt;- apply( mu.ensemble$link, 2, mean)
-mu.ensemble.PI &lt;- apply( mu.ensemble$link, 2, PI)
-
-plot(crime_cases ~ Bx3, data=data.plot, col=&quot;slateblue&quot;,main = &quot;WAIC Model&quot;)
-lines( Bx3.seq, mu.ensemble.mean )
-shade(mu.ensemble.PI, Bx3.seq)
-
-
-###
-prediction.data = data.frame(Bx1 = Bx1.seq, Bx2 = mean(d3$Bx2), Bx3 = mean(d3$Bx3)
-                             , std_b = mean(d3$std_b), score_s = mean(d3$score_s), Bscore_s = mean(d3$Bscore_s))
-
-mu.ensemble &lt;- ensemble(m1.stan, m2.stan, data = prediction.data)
-mu.ensemble.mean &lt;- apply( mu.ensemble$link, 2, mean)
-mu.ensemble.PI &lt;- apply( mu.ensemble$link, 2, PI)
-
-plot(crime_cases ~ Bx1, data=data.plot, col=&quot;slateblue&quot;,main = &quot;WAIC Model&quot;)
-lines( Bx1.seq, mu.ensemble.mean )
-shade(mu.ensemble.PI, Bx1.seq)
-
-###
-prediction.data = data.frame(Bx1 = mean(d3$Bx1), Bx2 = mean(d3$Bx2), Bx3 = mean(d3$Bx3)
-                             , std_b = std_b.seq, score_s = mean(d3$score_s), Bscore_s = mean(d3$Bscore_s))
-
-mu.ensemble &lt;- ensemble(m1.stan, m2.stan, data = prediction.data)
-mu.ensemble.mean &lt;- apply( mu.ensemble$link, 2, mean)
-mu.ensemble.PI &lt;- apply( mu.ensemble$link, 2, PI)
-
-plot(crime_cases ~ std_b, data=data.plot, col=&quot;slateblue&quot;,main = &quot;WAIC Model&quot;)
-lines( std_b.seq, mu.ensemble.mean )
-shade(mu.ensemble.PI, std_b.seq)
-
-###
-prediction.data = data.frame(Bx1 = mean(d3$Bx1), Bx2 = mean(d3$Bx2), Bx3 = mean(d3$Bx3)
-                             , std_b = mean(d3$std_b), score_s = score_s.seq, Bscore_s = mean(d3$Bscore_s))
-
-mu.ensemble &lt;- ensemble(m1.stan, m2.stan, data = prediction.data)
-mu.ensemble.mean &lt;- apply( mu.ensemble$link, 2, mean)
-mu.ensemble.PI &lt;- apply( mu.ensemble$link, 2, PI)
-
-plot(crime_cases ~ score_s, data=data.plot, col=&quot;slateblue&quot;,main = &quot;WAIC Model&quot;)
-lines( score_s.seq, mu.ensemble.mean )
-shade(mu.ensemble.PI, score_s.seq)
-
-###
-prediction.data = data.frame(Bx1 = mean(d3$Bx1), Bx2 = mean(d3$Bx2), Bx3 = mean(d3$Bx3)
-                             , std_b = mean(d3$std_b), score_s = mean(d3$score_s), Bscore_s = Bscore_s.seq)
-
-mu.ensemble &lt;- ensemble(m1.stan, m2.stan, data = prediction.data)
-mu.ensemble.mean &lt;- apply( mu.ensemble$link, 2, mean)
-mu.ensemble.PI &lt;- apply( mu.ensemble$link, 2, PI)
-
-plot(crime_cases ~ Bscore_s, data=data.plot, col=&quot;slateblue&quot;,main = &quot;WAIC Model&quot;)
-lines( Bscore_s.seq, mu.ensemble.mean )
-shade(mu.ensemble.PI, Bscore_s.seq)</code></pre>
+  pred.m &lt;- link( m1 , data=d.predict )</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>  mu &lt;- apply( pred.m , 2 , mean )
+  mu.PI &lt;- apply( pred.m , 2 , PI )
+  
+  plot( log_crime ~ log_box_office , d , col=rangi2 )
+  lines( log_box_office.seq , mu , lty=2 )
+  lines( log_box_office.seq, mu.PI[1,] , lty=2 )
+  lines( log_box_office.seq , mu.PI[2,] , lty=2 )
+  
+  log_crime.ensemble &lt;- ensemble( m1 , m2 ,data=d.predict )</code></pre>
+<pre><code>## Constructing posterior predictions</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre><code>## Constructing posterior predictions</code></pre>
+<pre><code>## [ 100 / 1000 ]
+[ 200 / 1000 ]
+[ 300 / 1000 ]
+[ 400 / 1000 ]
+[ 500 / 1000 ]
+[ 600 / 1000 ]
+[ 700 / 1000 ]
+[ 800 / 1000 ]
+[ 900 / 1000 ]
+[ 1000 / 1000 ]</code></pre>
+<pre class="r"><code>  mu &lt;- apply( log_crime.ensemble$link , 2 , mean )
+  mu.PI &lt;- apply( log_crime.ensemble$link , 2 , PI )
+  lines( log_box_office.seq , mu )
+  shade( mu.PI , log_box_office.seq )</code></pre>
+<p><img src="compare_files/figure-html/m2.average-1.png" width="672" /></p>
+</div>
+</div>
 
 
 

@@ -309,682 +309,151 @@ div.tocify {
 <div id="load-packages" class="section level2">
 <h2>Load Packages</h2>
 <p>Load all required packages.</p>
-<pre class="r"><code>library(readr)
-library(rstan)</code></pre>
-<pre><code>## Loading required package: ggplot2</code></pre>
-<pre><code>## Loading required package: StanHeaders</code></pre>
-<pre><code>## rstan (Version 2.16.2, packaged: 2017-07-03 09:24:58 UTC, GitRev: 2e1f913d3ca3)</code></pre>
-<pre><code>## For execution on a local, multicore CPU with excess RAM we recommend calling
-## rstan_options(auto_write = TRUE)
-## options(mc.cores = parallel::detectCores())</code></pre>
-<pre class="r"><code>library(rethinking)</code></pre>
-<pre><code>## Loading required package: parallel</code></pre>
-<pre><code>## rethinking (Version 1.59)</code></pre>
 </div>
-<div id="model-1" class="section level2">
-<h2>Model 1</h2>
-<div id="building-model-1" class="section level3">
-<h3>Building Model 1</h3>
-<div id="import-data" class="section level4">
-<h4>Import Data</h4>
+<div id="building-model-1" class="section level2">
+<h2>Building Model 1</h2>
+<div id="import-data" class="section level3">
+<h3>Import Data</h3>
 <p>Import the Model 1 Dataset.</p>
 <pre class="r"><code># read files
 data1 = read.csv(file.path(&quot;datasets&quot;, &quot;M1.data.new.csv&quot;))</code></pre>
 </div>
-<div id="preprocess-data" class="section level4">
-<h4>Preprocess Data</h4>
-<pre class="r"><code>d1 = data.frame(cbind(data1$Total_cases_Number, data1$Bx1, data1$Bx2, data1$Bx3))
-names(d1) = c(&quot;Total_cases_Number&quot;,&quot;Bx1&quot;,&quot;Bx2&quot;,&quot;Bx3&quot;) 
+<div id="preprocess-data" class="section level3">
+<h3>Preprocess Data</h3>
+<p>Step 1 : Preprocess all variables to its correct numeric values.</p>
+<p>Step 2 : Make log version of outcome to examine the magnitude of such.</p>
+<p>Step 3 : Center predictors for better inference.</p>
+<p>Step 4 : Also, for better efficiency and to avoid common problems later on in Stan, we make a new trimmed down data frame.</p>
+<pre class="r"><code># factor to numeric
+data1$crime_cases = as.numeric(as.character(data1$Total_cases_Number))
+# fix NAs
+data1[1,&quot;crime_cases&quot;] = 115879
 
-d1$crime_cases = (d1$Total_cases_Number - mean(d1$Total_cases_Number))/sd(d1$Total_cases_Number)</code></pre>
+# make log version of outcome
+data1$log_crime = log(data1$crime_cases)
+
+# construct centered predictor 
+data1$Bx1_c&lt;- data1$Bx1 - mean(data1$Bx1)
+data1$Bx2_c&lt;- data1$Bx2 - mean(data1$Bx2)
+data1$Bx3_c&lt;- data1$Bx3 - mean(data1$Bx3)
+
+# trim data frame
+d1 = data1[ , c(&quot;log_crime&quot;,&quot;Bx1_c&quot;,&quot;Bx2_c&quot;,&quot;Bx3_c&quot;)]</code></pre>
 </div>
-<div id="build-model" class="section level4">
-<h4>Build Model</h4>
-<p>Build Model 1 with map.</p>
-<pre class="r"><code># Method 1
+<div id="build-model" class="section level3">
+<h3>Build Model</h3>
+<p>Fit the model using quadratic approximation (map).</p>
+<pre class="r"><code># define model fit by map
 m1 &lt;- map(
   alist(
-    crime_cases ~ dnorm(mu, sigma),
-    mu &lt;- a +b1*Bx1 + b2*Bx2 + b3*Bx3,
-    a ~ dnorm(0,10),
-    b1 ~ dnorm(0,10),
-    b2 ~ dnorm(0,10),
-    b3 ~ dnorm(0,10),
+    log_crime ~ dnorm(mu, sigma),
+    mu &lt;- a +b1*Bx1_c + b2*Bx2_c + b3*Bx3_c,
+    a ~ dnorm(11,100),
+    b1 ~ dnorm(0,1),
+    b2 ~ dnorm(0,1),
+    b3 ~ dnorm(0,1),
     sigma ~ dunif(0,10)
   ),
-  data &lt;- d1,
-  start&lt;-list(a=mean(d1$crime_cases),b1=0,b2=0,b3=0, sigma=sd(d1$crime_cases)))</code></pre>
+  data &lt;- d1)</code></pre>
+<p>Fit the model using Hamiltonian Monte Carlo (map2stan).</p>
+<pre class="r"><code># define model fit by map2stan
+m1.stan &lt;- map2stan(
+    alist(
+    log_crime ~ dnorm(mu, sigma),
+    mu &lt;- a +b1*Bx1_c + b2*Bx2_c + b3*Bx3_c,
+    a ~ dnorm(11,100),
+    b1 ~ dnorm(0,1),
+    b2 ~ dnorm(0,1),
+    b3 ~ dnorm(0,1),
+    sigma ~ dcauchy(0,2)
+  ),
+  data &lt;- d1)</code></pre>
 </div>
-</div>
-<div id="examining-model-1" class="section level3">
-<h3>Examining Model 1</h3>
-<div id="parameter-overview" class="section level4">
-<h4>Parameter Overview</h4>
-<p>From the pairs plot below, we can see that</p>
-<pre class="r"><code>pairs(m1)</code></pre>
-<p><img src="model_files/figure-html/m1.pairs-1.png" width="672" /></p>
-<p>We then examine the parameter estimates of Model 1.</p>
-<pre class="r"><code>precis(m1)</code></pre>
-<pre><code>##        Mean StdDev   5.5% 94.5%
-## a     -7.88   2.75 -12.28 -3.49
-## b1     0.51   0.16   0.26  0.76
-## b2     0.46   0.16   0.21  0.72
-## b3     0.36   0.16   0.10  0.62
-## sigma  0.82   0.10   0.66  0.99</code></pre>
-</div>
-<div id="parameter-effects" class="section level4">
-<h4>Parameter Effects</h4>
-<p>The effect of movie types are shown below:</p>
-<ol style="list-style-type: decimal">
-<li>Crime-inducing: Bx1</li>
-</ol>
-<pre class="r"><code>Bx1.seq &lt;- seq(from = 0, to = 10, length.out = 100)
-mu &lt;- link(m1, data = data.frame(Bx1 = Bx1.seq, Bx2 = mean(d1$Bx2), Bx3 = mean(d1$Bx3)))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ Bx1, data = d1)
-lines(Bx1.seq, mu.mean)
-
-shade(mu.PI, Bx1.seq)</code></pre>
-<p><img src="model_files/figure-html/m1.bx1-1.png" width="672" /></p>
-<ol start="2" style="list-style-type: decimal">
-<li>Crime-reducing: Bx2</li>
-</ol>
-<pre class="r"><code>Bx2.seq &lt;- seq(from = 0, to = 111, length.out = 100)
-mu &lt;- link(m1, data = data.frame(Bx2 = Bx2.seq, Bx1 = mean(d1$Bx1), Bx3 = mean(d1$Bx3)))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ Bx2, data = d1)
-lines(Bx2.seq, mu.mean)
-
-shade(mu.PI, Bx2.seq)</code></pre>
-<p><img src="model_files/figure-html/m1.bx2-1.png" width="672" /></p>
-<ol start="3" style="list-style-type: decimal">
-<li>Neutral: Bx3</li>
-</ol>
-<pre class="r"><code>Bx3.seq &lt;- seq(from = 0, to = 11, length.out = 100)
-mu &lt;- link(m1, data = data.frame(Bx3 = Bx3.seq, Bx1 = mean(d1$Bx1), Bx2 = mean(d1$Bx2)))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ Bx3, data = d1)
-lines(Bx3.seq, mu.mean)
-
-shade(mu.PI, Bx3.seq)</code></pre>
-<p><img src="model_files/figure-html/m1.bx3-1.png" width="672" /></p>
-</div>
-</div>
-</div>
-<div id="model-1-with-stan" class="section level2">
-<h2>Model 1 With Stan</h2>
-<div id="building-model-1-with-stan" class="section level3">
-<h3>Building Model 1 With Stan</h3>
-<div id="build-model-1" class="section level4">
-<h4>Build Model</h4>
-<p>Build Model 1 with map2stan.</p>
-<pre class="r"><code># Method 2
-m1.stan &lt;- map2stan( m1, data&lt;-d1, iter = 1e4, warmup = 1000) </code></pre>
-<pre><code>## In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/config.hpp:39:0,
-##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/math/tools/config.hpp:13,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/var.hpp:7,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:12,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file1dc84a5a675c.cpp:8:
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
-##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
-##  ^
-## &lt;command-line&gt;:0:0: note: this is the location of the previous definition
-## In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/base.hpp:28:0,
-##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array.hpp:21,
-##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint/util/multi_array_adaption.hpp:29,
-##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint.hpp:61,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr/functor/integrate_ode_rk45.hpp:13,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr.hpp:38,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/mat.hpp:298,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:12,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file1dc84a5a675c.cpp:8:
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function &#39;static void boost::multi_array_concepts::detail::idgen_helper&lt;N&gt;::call(Array&amp;, const IdxGen&amp;, Call_Type)&#39;:
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:42:43: warning: typedef &#39;index_range&#39; locally defined but not used [-Wunused-local-typedefs]
-##        typedef typename Array::index_range index_range;
-##                                            ^
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:43:37: warning: typedef &#39;index&#39; locally defined but not used [-Wunused-local-typedefs]
-##        typedef typename Array::index index;
-##                                      ^
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function &#39;static void boost::multi_array_concepts::detail::idgen_helper&lt;0ull&gt;::call(Array&amp;, const IdxGen&amp;, Call_Type)&#39;:
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:53:43: warning: typedef &#39;index_range&#39; locally defined but not used [-Wunused-local-typedefs]
-##        typedef typename Array::index_range index_range;
-##                                            ^
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:54:37: warning: typedef &#39;index&#39; locally defined but not used [-Wunused-local-typedefs]
-##        typedef typename Array::index index;
-##                                      ^
-## In file included from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:42:0,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file1dc84a5a675c.cpp:8:
-## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp: At global scope:
-## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
-##      static void set_zero_all_adjoints() {
-##                  ^
-## 
-## SAMPLING FOR MODEL &#39;crime_cases ~ dnorm(mu, sigma)&#39; NOW (CHAIN 1).
-## 
-## Gradient evaluation took 0 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
-## Adjust your expectations accordingly!
-## 
-## 
-## Iteration:    1 / 10000 [  0%]  (Warmup)
-## Iteration: 1000 / 10000 [ 10%]  (Warmup)
-## Iteration: 1001 / 10000 [ 10%]  (Sampling)
-## Iteration: 2000 / 10000 [ 20%]  (Sampling)
-## Iteration: 3000 / 10000 [ 30%]  (Sampling)
-## Iteration: 4000 / 10000 [ 40%]  (Sampling)
-## Iteration: 5000 / 10000 [ 50%]  (Sampling)
-## Iteration: 6000 / 10000 [ 60%]  (Sampling)
-## Iteration: 7000 / 10000 [ 70%]  (Sampling)
-## Iteration: 8000 / 10000 [ 80%]  (Sampling)
-## Iteration: 9000 / 10000 [ 90%]  (Sampling)
-## Iteration: 10000 / 10000 [100%]  (Sampling)
-## 
-##  Elapsed Time: 0.385 seconds (Warm-up)
-##                3.781 seconds (Sampling)
-##                4.166 seconds (Total)
-## 
-## 
-## SAMPLING FOR MODEL &#39;crime_cases ~ dnorm(mu, sigma)&#39; NOW (CHAIN 1).
-## 
-## Gradient evaluation took 0 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
-## Adjust your expectations accordingly!
-## 
-## 
-## WARNING: No variance estimation is
-##          performed for num_warmup &lt; 20
-## 
-## Iteration: 1 / 1 [100%]  (Sampling)
-## 
-##  Elapsed Time: 0 seconds (Warm-up)
-##                0 seconds (Sampling)
-##                0 seconds (Total)</code></pre>
-<pre><code>## Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
-## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</code></pre>
-<pre><code>## Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
-<pre><code>## Computing WAIC</code></pre>
-<pre><code>## Constructing posterior predictions</code></pre>
-<pre><code>## [ 900 / 9000 ]
-[ 1800 / 9000 ]
-[ 2700 / 9000 ]
-[ 3600 / 9000 ]
-[ 4500 / 9000 ]
-[ 5400 / 9000 ]
-[ 6300 / 9000 ]
-[ 7200 / 9000 ]
-[ 8100 / 9000 ]
-[ 9000 / 9000 ]</code></pre>
-</div>
-</div>
-<div id="examining-model-1-with-stan" class="section level3">
-<h3>Examining Model 1 With Stan</h3>
-<div id="parameter-overview-1" class="section level4">
-<h4>Parameter Overview</h4>
-<p>From the pairs plot below, we can see that</p>
+<div id="parameter-overview" class="section level3">
+<h3>Parameter Overview</h3>
+<p>Compare map to map2stan to check the quadratic approximation. From the table of coefficients, we can see that the numbers are approximately the same.</p>
+<pre class="r"><code>coeftab(m1, m1.stan)</code></pre>
+<pre><code>##       m1      m1.stan
+## a       11.36   11.36
+## b1      -0.03   -0.03
+## b2      -0.01   -0.01
+## b3      -0.06   -0.06
+## sigma    0.12    0.13
+## nobs       32      32</code></pre>
+<p>For the Stan model and these data, the resulting posterior distribution is quite nearly multivariate Gaussian. The density for sigma is certainly skewed in a certain direction, but otherwise the quadratic approximation does almost as well as Hamiltonian Monte Carlo. Since the quadratic approximation turned out to be okay, we can continue to use map estimates.</p>
+<p>However, there remain strong correlations between multiple parameters (b1, b2, and b3, specifically) even though we centered the predictors prior to fitting. This needs to be taken into consideration when examining the model.</p>
 <pre class="r"><code>pairs(m1.stan)</code></pre>
 <p><img src="model_files/figure-html/m1.stan.pairs-1.png" width="672" /></p>
-<p>We then examine the parameter estimates of Model 1 with Stan.</p>
-<pre class="r"><code>precis(m1.stan)</code></pre>
-<pre><code>##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a     -7.77   2.93     -12.53      -3.37  1916    1
-## b1     0.50   0.17       0.23       0.76  2040    1
-## b2     0.46   0.17       0.19       0.73  2028    1
-## b3     0.35   0.17       0.08       0.63  2073    1
-## sigma  0.92   0.13       0.72       1.11  2496    1</code></pre>
-</div>
-<div id="parameter-effects-1" class="section level4">
-<h4>Parameter Effects</h4>
-<p>The effect of movie types are shown below:</p>
-<ol style="list-style-type: decimal">
-<li>Crime-inducing: Bx1</li>
-</ol>
-<pre class="r"><code>Bx1.seq &lt;- seq(from = 0, to = 10, length.out = 100)
-mu &lt;- link(m1.stan, data = data.frame(Bx1 = Bx1.seq, Bx2 = mean(d1$Bx2), Bx3 = mean(d1$Bx3)))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ Bx1, data = d1)
-lines(Bx1.seq, mu.mean)
-
-shade(mu.PI, Bx1.seq)</code></pre>
-<p><img src="model_files/figure-html/m1.stan.bx1-1.png" width="672" /></p>
-<ol start="2" style="list-style-type: decimal">
-<li>Crime-reducing: Bx2</li>
-</ol>
-<pre class="r"><code>Bx2.seq &lt;- seq(from = 0, to = 111, length.out = 100)
-mu &lt;- link(m1.stan, data = data.frame(Bx2 = Bx2.seq, Bx1 = mean(d1$Bx1), Bx3 = mean(d1$Bx3)))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ Bx2, data = d1)
-lines(Bx2.seq, mu.mean)
-
-shade(mu.PI, Bx2.seq)</code></pre>
-<p><img src="model_files/figure-html/m1.stan.bx2-1.png" width="672" /></p>
-<ol start="3" style="list-style-type: decimal">
-<li>Neutral: Bx3</li>
-</ol>
-<pre class="r"><code>Bx3.seq &lt;- seq(from = 0, to = 11, length.out = 100)
-mu &lt;- link(m1.stan, data = data.frame(Bx3 = Bx3.seq, Bx1 = mean(d1$Bx1), Bx2 = mean(d1$Bx2)))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ Bx3, data = d1)
-lines(Bx3.seq, mu.mean)
-
-shade(mu.PI, Bx3.seq)</code></pre>
-<p><img src="model_files/figure-html/m1.stan.bx3-1.png" width="672" /></p>
 </div>
 </div>
-</div>
-<div id="model-2" class="section level2">
-<h2>Model 2</h2>
-<div id="building-model-2" class="section level3">
-<h3>Building Model 2</h3>
-<div id="import-data-1" class="section level4">
-<h4>Import Data</h4>
+<div id="building-model-2" class="section level2">
+<h2>Building Model 2</h2>
+<div id="import-data-1" class="section level3">
+<h3>Import Data</h3>
 <p>Import the Model 2 Dataset.</p>
 <pre class="r"><code># read files
 data2 = read.csv(file.path(&quot;datasets&quot;, &quot;M2.data.new.csv&quot;))</code></pre>
 </div>
-<div id="preprocess-data-1" class="section level4">
-<h4>Preprocess Data</h4>
-<pre class="r"><code>box_office = exp(data2$log_box_office)
-std_b = (box_office - mean(box_office))/sd(box_office)
-data2$std_b = std_b
+<div id="preprocess-data-1" class="section level3">
+<h3>Preprocess Data</h3>
+<p>Step 1 : Preprocess all variables to its correct numeric values.</p>
+<p>Step 2 : Make log version of outcome to examine the magnitude of such.</p>
+<p>Step 3 : For better efficiency and to avoid common problems later on in Stan, we make a new trimmed down data frame.</p>
+<pre class="r"><code># factor to numeric
+data2$crime_cases = as.numeric(as.character(data2$Total_cases_Number))
+# fix NAs
+data2[1,&quot;crime_cases&quot;] = 115879
 
-d2 = data.frame(cbind(data2$Total_cases_Number, data2$std_b, data2$score.s, data2$Bscore.s))
-names(d2) = c(&quot;Total_cases_Number&quot;,&quot;std_b&quot;,&quot;score_s&quot;,&quot;Bscore_s&quot;) 
+# make log version of outcome
+data2$log_crime = log(data2$crime_cases)
 
-d2$crime_cases = (d2$Total_cases_Number - mean(d2$Total_cases_Number))/sd(d2$Total_cases_Number)</code></pre>
+# trim data frame
+d2 = data2[ , c(&quot;log_crime&quot;,&quot;log_box_office&quot;,&quot;score.s&quot;,&quot;Bscore.s&quot;)]</code></pre>
 </div>
-<div id="build-model-2" class="section level4">
-<h4>Build Model</h4>
-<p>Build Model 2 with map.</p>
-<pre class="r"><code># Method 1
+<div id="build-model-1" class="section level3">
+<h3>Build Model</h3>
+<p>Fit the model using quadratic approximation (map).</p>
+<pre class="r"><code># define model fit by map
 m2 &lt;- map(
   alist(
-    crime_cases ~ dnorm(mu, sigma),
-    mu &lt;- a +c1*std_b + c2*score_s + c3*Bscore_s,
-    a ~ dnorm(0,10),
-    c1 ~ dnorm(0,10),
-    c2 ~ dnorm(0,10),
-    c3 ~ dnorm(0,10),
+    log_crime ~ dnorm(mu, sigma),
+    mu &lt;- a +b1*log_box_office + b2*score.s + b3*Bscore.s,
+    a ~ dnorm(11,100),
+    b1 ~ dnorm(0,1),
+    b2 ~ dnorm(0,1),
+    b3 ~ dnorm(0,1),
     sigma ~ dunif(0,10)
   ),
-  data &lt;- d2,
-  start&lt;-list(a=mean(d2$crime_cases),c1=0,c2=0,c3=0, sigma=sd(d2$crime_cases)))</code></pre>
+  data &lt;- d2)</code></pre>
+<p>Fit the model using Hamiltonian Monte Carlo (map2stan).</p>
+<pre class="r"><code># define model fit by map2stan
+m2.stan &lt;- map2stan(
+    alist(
+    log_crime ~ dnorm(mu, sigma),
+    mu &lt;- a +b1*log_box_office + b2*score.s + b3*Bscore.s,
+    a ~ dnorm(11,100),
+    b1 ~ dnorm(0,1),
+    b2 ~ dnorm(0,1),
+    b3 ~ dnorm(0,1),
+    sigma ~ dcauchy(0,2)
+  ),
+  data &lt;- d2)</code></pre>
 </div>
-</div>
-<div id="examining-model-2" class="section level3">
-<h3>Examining Model 2</h3>
-<div id="parameter-overview-2" class="section level4">
-<h4>Parameter Overview</h4>
-<p>From the pairs plot below, we can see that</p>
-<pre class="r"><code>pairs(m2)</code></pre>
-<p><img src="model_files/figure-html/m2.pairs-1.png" width="672" /></p>
-<p>We then examine the parameter estimates of Model 2.</p>
-<pre class="r"><code>precis(m2)</code></pre>
-<pre><code>##        Mean StdDev   5.5% 94.5%
-## a      0.01   0.17  -0.26  0.27
-## c1     0.21   0.18  -0.08  0.49
-## c2     3.78   9.82 -11.92 19.47
-## c3    -0.30   0.57  -1.21  0.62
-## sigma  0.94   0.12   0.75  1.13</code></pre>
-</div>
-<div id="parameter-effects-2" class="section level4">
-<h4>Parameter Effects</h4>
-<p>The effect of box office results and movie scores are shown below:</p>
-<ol style="list-style-type: decimal">
-<li>Box office results: std.b</li>
-</ol>
-<pre class="r"><code>std_b.seq &lt;- seq(from = -3, to = 3, length.out = 100)
-mu &lt;- link(m2, data = data.frame(std_b = std_b.seq, score_s = mean(d2$score_s), Bscore_s = mean(d2$Bscore_s)))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ std_b, data = d2)
-lines(std_b.seq, mu.mean)
-
-shade(mu.PI, std_b.seq)</code></pre>
-<p><img src="model_files/figure-html/m2.box-1.png" width="672" /></p>
-<ol start="2" style="list-style-type: decimal">
-<li>Movie scores: score.s</li>
-</ol>
-<pre class="r"><code>score_s.seq &lt;- seq(from = -1, to = 1, length.out = 100)
-mu &lt;- link(m2, data = data.frame(score_s = score_s.seq, std_b = mean(d2$std_b), Bscore_s = mean(d2$Bscore_s)))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ score_s, data = d2)
-lines(score_s.seq, mu.mean)
-
-shade(mu.PI, score_s.seq)</code></pre>
-<p><img src="model_files/figure-html/m2.score-1.png" width="672" /></p>
-<ol start="3" style="list-style-type: decimal">
-<li>Interaction between box office results and movie scores:</li>
-</ol>
-<pre class="r"><code>Bscore_s.seq &lt;- seq(from = -6, to = 9, length.out = 100)
-mu &lt;- link(m2, data = data.frame(score_s = mean(d2$score_s), std_b = mean(d2$std_b), Bscore_s = Bscore_s.seq))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ Bscore_s, data = d2)
-lines(Bscore_s.seq, mu.mean)
-
-shade(mu.PI, Bscore_s.seq)</code></pre>
-<p><img src="model_files/figure-html/m2.boxscore-1.png" width="672" /></p>
-</div>
-</div>
-</div>
-<div id="model-2-with-stan" class="section level2">
-<h2>Model 2 With Stan</h2>
-<div id="building-model-2-with-stan" class="section level3">
-<h3>Building Model 2 With Stan</h3>
-<div id="build-model-3" class="section level4">
-<h4>Build Model</h4>
-<p>Build Model 2 with map2stan.</p>
-<pre class="r"><code># Method 2
-m2.stan &lt;- map2stan( m2, data&lt;-d2, iter = 1e4, warmup = 1000) </code></pre>
-<pre><code>## In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/config.hpp:39:0,
-##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/math/tools/config.hpp:13,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/var.hpp:7,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:12,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file1dc82e304e48.cpp:8:
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: &quot;BOOST_NO_CXX11_RVALUE_REFERENCES&quot; redefined
-##  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
-##  ^
-## &lt;command-line&gt;:0:0: note: this is the location of the previous definition
-## In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/base.hpp:28:0,
-##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array.hpp:21,
-##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint/util/multi_array_adaption.hpp:29,
-##                  from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint.hpp:61,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr/functor/integrate_ode_rk45.hpp:13,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr.hpp:38,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/mat.hpp:298,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:12,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file1dc82e304e48.cpp:8:
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function &#39;static void boost::multi_array_concepts::detail::idgen_helper&lt;N&gt;::call(Array&amp;, const IdxGen&amp;, Call_Type)&#39;:
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:42:43: warning: typedef &#39;index_range&#39; locally defined but not used [-Wunused-local-typedefs]
-##        typedef typename Array::index_range index_range;
-##                                            ^
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:43:37: warning: typedef &#39;index&#39; locally defined but not used [-Wunused-local-typedefs]
-##        typedef typename Array::index index;
-##                                      ^
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function &#39;static void boost::multi_array_concepts::detail::idgen_helper&lt;0ull&gt;::call(Array&amp;, const IdxGen&amp;, Call_Type)&#39;:
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:53:43: warning: typedef &#39;index_range&#39; locally defined but not used [-Wunused-local-typedefs]
-##        typedef typename Array::index_range index_range;
-##                                            ^
-## C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:54:37: warning: typedef &#39;index&#39; locally defined but not used [-Wunused-local-typedefs]
-##        typedef typename Array::index index;
-##                                      ^
-## In file included from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:42:0,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
-##                  from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-##                  from file1dc82e304e48.cpp:8:
-## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp: At global scope:
-## C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: &#39;void stan::math::set_zero_all_adjoints()&#39; defined but not used [-Wunused-function]
-##      static void set_zero_all_adjoints() {
-##                  ^
-## 
-## SAMPLING FOR MODEL &#39;crime_cases ~ dnorm(mu, sigma)&#39; NOW (CHAIN 1).
-## 
-## Gradient evaluation took 0 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
-## Adjust your expectations accordingly!
-## 
-## 
-## Iteration:    1 / 10000 [  0%]  (Warmup)
-## Iteration: 1000 / 10000 [ 10%]  (Warmup)
-## Iteration: 1001 / 10000 [ 10%]  (Sampling)
-## Iteration: 2000 / 10000 [ 20%]  (Sampling)
-## Iteration: 3000 / 10000 [ 30%]  (Sampling)
-## Iteration: 4000 / 10000 [ 40%]  (Sampling)
-## Iteration: 5000 / 10000 [ 50%]  (Sampling)
-## Iteration: 6000 / 10000 [ 60%]  (Sampling)
-## Iteration: 7000 / 10000 [ 70%]  (Sampling)
-## Iteration: 8000 / 10000 [ 80%]  (Sampling)
-## Iteration: 9000 / 10000 [ 90%]  (Sampling)
-## Iteration: 10000 / 10000 [100%]  (Sampling)
-## 
-##  Elapsed Time: 0.316 seconds (Warm-up)
-##                2.568 seconds (Sampling)
-##                2.884 seconds (Total)
-## 
-## 
-## SAMPLING FOR MODEL &#39;crime_cases ~ dnorm(mu, sigma)&#39; NOW (CHAIN 1).
-## 
-## Gradient evaluation took 0 seconds
-## 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
-## Adjust your expectations accordingly!
-## 
-## 
-## WARNING: No variance estimation is
-##          performed for num_warmup &lt; 20
-## 
-## Iteration: 1 / 1 [100%]  (Sampling)
-## 
-##  Elapsed Time: 0 seconds (Warm-up)
-##                0 seconds (Sampling)
-##                0 seconds (Total)</code></pre>
-<pre><code>## Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
-## http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup</code></pre>
-<pre><code>## Warning: Examine the pairs() plot to diagnose sampling problems</code></pre>
-<pre><code>## Computing WAIC</code></pre>
-<pre><code>## Constructing posterior predictions</code></pre>
-<pre><code>## [ 900 / 9000 ]
-[ 1800 / 9000 ]
-[ 2700 / 9000 ]
-[ 3600 / 9000 ]
-[ 4500 / 9000 ]
-[ 5400 / 9000 ]
-[ 6300 / 9000 ]
-[ 7200 / 9000 ]
-[ 8100 / 9000 ]
-[ 9000 / 9000 ]</code></pre>
-</div>
-</div>
-<div id="examining-model-2-with-stan" class="section level3">
-<h3>Examining Model 2 With Stan</h3>
-<div id="parameter-overview-3" class="section level4">
-<h4>Parameter Overview</h4>
-<p>From the pairs plot below, we can see that</p>
+<div id="parameter-overview-1" class="section level3">
+<h3>Parameter Overview</h3>
+<p>Compare map to map2stan to check the quadratic approximation. From the table of coefficients, we can see that the numbers are approximately the same.</p>
+<pre class="r"><code>coeftab(m2, m2.stan)</code></pre>
+<pre><code>##       m2      m2.stan
+## a       15.43   15.45
+## b1      -0.24   -0.24
+## b2      -0.09   -0.06
+## b3       0.00   -0.01
+## sigma    0.13    0.14
+## nobs       32      32</code></pre>
+<p>For the Stan model and these data, the resulting posterior distribution is quite nearly multivariate Gaussian. The density for sigma is quite skewed in a certain direction, but otherwise the quadratic approximation does almost as well as Hamiltonian Monte Carlo. Since the quadratic approximation turned out to be okay, we can continue to use map estimates.</p>
+<p>However, there remain strong correlations between multiple parameters (a and b1, b2 and b3, specifically) even though we standardized the predictors prior to fitting. This needs to be taken into consideration when examining the model.</p>
 <pre class="r"><code>pairs(m2.stan)</code></pre>
 <p><img src="model_files/figure-html/m2.stan.pairs-1.png" width="672" /></p>
-<p>We then examine the parameter estimates of Model 2 with Stan.</p>
-<pre class="r"><code>precis(m2.stan)</code></pre>
-<pre><code>##        Mean StdDev lower 0.89 upper 0.89 n_eff Rhat
-## a      0.01   0.18      -0.28       0.30  6039    1
-## c1     0.21   0.20      -0.10       0.52  7833    1
-## c2     3.30   9.90     -12.89      18.49  4081    1
-## c3    -0.27   0.58      -1.13       0.70  4066    1
-## sigma  1.03   0.15       0.79       1.24  5834    1</code></pre>
-</div>
-<div id="parameter-effects-3" class="section level4">
-<h4>Parameter Effects</h4>
-<p>The effect of box office results and movie scores are shown below:</p>
-<ol style="list-style-type: decimal">
-<li>Box office results: std.b</li>
-</ol>
-<pre class="r"><code>std_b.seq &lt;- seq(from = -3, to = 3, length.out = 100)
-mu &lt;- link(m2.stan, data = data.frame(std_b = std_b.seq, score_s = mean(d2$score_s), Bscore_s = mean(d2$Bscore_s)))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ std_b, data = d2)
-lines(std_b.seq, mu.mean)
-
-shade(mu.PI, std_b.seq)</code></pre>
-<p><img src="model_files/figure-html/m2.stan.box-1.png" width="672" /></p>
-<ol start="2" style="list-style-type: decimal">
-<li>Movie scores: score.s</li>
-</ol>
-<pre class="r"><code>score_s.seq &lt;- seq(from = -1, to = 1, length.out = 100)
-mu &lt;- link(m2.stan, data = data.frame(score_s = score_s.seq, std_b = mean(d2$std_b), Bscore_s = mean(d2$Bscore_s)))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ score_s, data = d2)
-lines(score_s.seq, mu.mean)
-
-shade(mu.PI, score_s.seq)</code></pre>
-<p><img src="model_files/figure-html/m2.stan.score-1.png" width="672" /></p>
-<ol start="3" style="list-style-type: decimal">
-<li>Interaction between box office results and movie scores:</li>
-</ol>
-<pre class="r"><code>Bscore_s.seq &lt;- seq(from = -6, to = 9, length.out = 100)
-mu &lt;- link(m2.stan, data = data.frame(score_s = mean(d2$score_s), std_b = mean(d2$std_b), Bscore_s = Bscore_s.seq))</code></pre>
-<pre><code>## [ 100 / 1000 ]
-[ 200 / 1000 ]
-[ 300 / 1000 ]
-[ 400 / 1000 ]
-[ 500 / 1000 ]
-[ 600 / 1000 ]
-[ 700 / 1000 ]
-[ 800 / 1000 ]
-[ 900 / 1000 ]
-[ 1000 / 1000 ]</code></pre>
-<pre class="r"><code>mu.mean &lt;- apply(mu, 2, mean)
-mu.PI &lt;- apply(mu, 2, PI, prob = 0.95)
-
-plot(crime_cases ~ Bscore_s, data = d2)
-lines(Bscore_s.seq, mu.mean)
-
-shade(mu.PI, Bscore_s.seq)</code></pre>
-<p><img src="model_files/figure-html/m2.stan.boxscore-1.png" width="672" /></p>
-</div>
 </div>
 </div>
 
