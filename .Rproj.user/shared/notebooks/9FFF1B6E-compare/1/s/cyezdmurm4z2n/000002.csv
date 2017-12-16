@@ -1,0 +1,28 @@
+"0","# Model 2"
+"0","log_box_office.seq <- seq(from=16, to=18, length.out = 30)"
+"0","d.predict <- list("
+"0","  log_crime = rep(0,30),"
+"0","  Bx1_c = rep(0,30),"
+"0","  Bx2_c = rep(0,30),"
+"0","  Bx3_c = rep(0,30),"
+"0","  log_box_office = log_box_office.seq,"
+"0","  score.s = rep(0,30),"
+"0","  Bscore.s = rep(0,30)"
+"0",")"
+"0","  pred.m <- link( m2 , data=d.predict )"
+"1","[ 100 / 1000 ]"
+"1","[ 200 / 1000 ]"
+"1","[ 300 / 1000 ]"
+"1","[ 400 / 1000 ]"
+"1","[ 500 / 1000 ]"
+"1","[ 600 / 1000 ]"
+"1","[ 700 / 1000 ]"
+"1","[ 800 / 1000 ]"
+"1","[ 900 / 1000 ]"
+"1","[ 1000 / 1000 ]"
+"1","
+"
+"0","  mu <- apply( pred.m , 2 , mean )"
+"0","  mu.PI <- apply( pred.m , 2 , PI )"
+"0","  "
+"0","  plot( log_crime ~ log_box_office , d , col=rangi2 )"

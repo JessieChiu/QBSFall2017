@@ -92,3 +92,6 @@ m2.stan <- map2stan(
     sigma ~ dcauchy(0,2)
   ),
   data <- d2)
+
+# combine d1, d2
+d = merge(d1,d2)

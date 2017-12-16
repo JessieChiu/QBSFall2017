@@ -1,0 +1,184 @@
+---
+title: "Counterfactual Plots"
+output: flexdashboard::flex_dashboard
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load Packages
+
+Load all required packages.
+
+```{r library, include=FALSE}
+library(readr)
+library(flexdashboard)
+```
+
+## Import Values
+
+Import values computed from Model Building .
+
+```{r global, eval=FALSE}
+# read files
+source(file.path("datasets", "model.R"))
+```
+
+```{r global2, include=FALSE}
+# read files
+source(file.path("datasets", "model.R"))
+```
+
+## Model 1
+
+Examine the prediction changes of **log crime cases** as you change one predictor variable at a time.
+
+According to the counterfactual plots, we can conclude that:
+
+1. Predictor variable Bx3_c : 
+
+**the effect of movie type - "Neutral"** has strong negative association with **log crime cases**.
+
+2. Predictor variable Bx1_c : 
+
+**the effect of movie type - "Crime-inducing"** has a slightly weaker negative association with **log crime cases**.
+
+3. Predictor variable Bx2_c : 
+
+**the effect of movie type - "Crime-reducing"** has very weak negative association with **log crime cases**.
+
+```{r crime.m1, echo=FALSE}
+inputPanel(
+  selectInput("m1_select", label = "Select Predictor Variables:",
+             choices = c("Bx3_c", "Bx1_c", "Bx2_c"), selected = "Bx3_c"))
+helpText("Note: Y = log crime cases")
+helpText("Bx1_c = centered crime-inducing movies")
+helpText("Bx2_c = centered crime-reducing movies")
+helpText("Bx3_c = centered neutral movies")
+
+# counterfactual plot holding other predictor variables constant at its mean 
+# define model and fit 
+model1 <- lm(log_crime~ Bx1_c + Bx2_c + Bx3_c, data=d)
+X_seq <- seq( from=-5.5, to=4.2, length.out=30 )
+
+renderPlot({
+  for (i in 1:3){
+    if(input$m1_select ==  paste0("Bx", i,"_c")) {
+      Bx1_c <- mean(d$Bx1_c)
+      Bx2_c <- mean(d$Bx2_c) 
+      Bx3_c <- mean(d$Bx3_c) 
+      assign(paste0("Bx", i,"_c"), X_seq)
+      pred.dat <- data.frame(
+        Bx1_c <- Bx1_c,
+        Bx2_c <- Bx2_c,
+        Bx3_c <- Bx3_c
+        )
+    
+      mu <- link(model1, data=pred.dat) 
+      mu.mean <- apply(mu, 2, mean) 
+      mu.PI <- apply(mu, 2, PI)
+  
+      plot(log_crime~ Bx1_c + Bx2_c + Bx3_c, data=d, type="n") 
+      lines(X_seq, mu.mean) 
+      shade(mu.PI, X_seq)
+    }
+  }
+})
+
+```
+
+.
+
+## Model 2
+
+Examine the prediction changes of **log crime cases** as you change one predictor variable at a time.
+
+According to the counterfactual plots, we can conclude that:
+
+1. Predictor variable log_box_office : 
+
+**the effect of log box office results** has strong negative association with **log crime cases**.
+
+2. Predictor variable score.s : 
+
+The wide confidence interval indicates that the sample size was too small. The data is consistent with a wide range of possible hypotheses. The conclusion that **the effect of movie scores** is negatively associated with ** log crime cases**, as shown in the plot, needs to be replicated with a larger sample size.
+
+3. Predictor variable Bscore.s : 
+
+The wide confidence interval indicates that the sample size was too small. The data is consistent with a wide range of possible hypotheses. The conclusion that **the effect of interaction between log box office results and movie scores** is negatively associated with ** log crime cases**, as shown in the plot, needs to be replicated with a larger sample size.
+
+```{r crime.m2, echo=FALSE}
+inputPanel(
+  selectInput("m2_select", label = "Select Predictor Variables:",
+             choices = c("log_box_office", "score.s", "Bscore.s"), selected = "log_box_office"))
+helpText("Note: Y = log crime cases")
+helpText("log_box_office = log box office results")
+helpText("score.s = standardized movie scores")
+helpText("Bscore.s = interaction between predictors log_box_office and score.s")
+
+# counterfactual plot holding other predictor variables constant at its mean 
+# define model and fit 
+model2 <- lm(log_crime ~ log_box_office + score.s + Bscore.s, data=d)
+
+renderPlot({
+  if(input$m2_select ==  "log_box_office") {
+      log_box_office.seq <- seq( from=16, to=18, length.out=30 )
+      score.s <- mean(d$score.s) 
+      Bscore.s <- mean(d$Bscore.s) 
+      pred.dat <- data.frame(
+        log_box_office <- log_box_office.seq,
+        score.s <- score.s,
+        Bscore.s <- Bscore.s
+        )
+    
+      mu <- link(model2, data=pred.dat) 
+      mu.mean <- apply(mu, 2, mean) 
+      mu.PI <- apply(mu, 2, PI)
+  
+      plot(log_crime ~ log_box_office, data=d, type="n") 
+      lines(log_box_office.seq, mu.mean) 
+      shade(mu.PI, log_box_office.seq)
+  }
+  
+  if(input$m2_select ==  "score.s") {
+      log_box_office <- mean(d$log_box_office)
+      score.s.seq <- seq( from=-0.4, to=0.5, length.out=30 ) 
+      Bscore.s <- mean(d$Bscore.s) 
+      pred.dat <- data.frame(
+        log_box_office <- log_box_office,
+        score.s <- score.s.seq,
+        Bscore.s <- Bscore.s
+        )
+    
+      mu <- link(model2, data=pred.dat) 
+      mu.mean <- apply(mu, 2, mean) 
+      mu.PI <- apply(mu, 2, PI)
+  
+      plot(log_crime ~ score.s, data=d, type="n") 
+      lines(score.s.seq, mu.mean) 
+      shade(mu.PI, score.s.seq)
+  }
+  
+  if(input$m2_select ==  "Bscore.s") {
+      log_box_office <- mean(d$log_box_office)
+      score.s <- mean(d$score.s) 
+      Bscore.s.seq <- seq( from=-6, to=9, length.out=30 ) 
+      pred.dat <- data.frame(
+        log_box_office <- log_box_office,
+        score.s <- score.s,
+        Bscore.s <- Bscore.s.seq
+        )
+    
+      mu <- link(model2, data=pred.dat) 
+      mu.mean <- apply(mu, 2, mean) 
+      mu.PI <- apply(mu, 2, PI)
+  
+      plot(log_crime ~ Bscore.s, data=d, type="n") 
+      lines(Bscore.s.seq, mu.mean) 
+      shade(mu.PI, Bscore.s.seq)
+  }
+})
+
+```

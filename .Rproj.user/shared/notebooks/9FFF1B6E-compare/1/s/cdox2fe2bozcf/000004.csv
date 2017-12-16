@@ -1,0 +1,487 @@
+"0","# read files"
+"2","Error in names(frame)[names(frame) == ""x""] <- name : 
+  names() applied to a non-vector
+"
+"0","source(file.path(""datasets"", ""model.R""))"
+"2","NAs introduced by coercion"
+"2","recompiling to avoid crashing R session
+"
+"1","In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/config.hpp:39:0,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/BH/include/boost/math/tools/config.hpp:13,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/var.hpp:7,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:12,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+"
+"1","                 from file11cc436f473.cpp:8:
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: ""BOOST_NO_CXX11_RVALUE_REFERENCES"" redefined
+"
+"1"," #  define BOOST_NO_CXX11_RVALUE_REFERENCES
+"
+"1"," ^
+"
+"1","<command-line>:0:0: note: this is the location of the previous definition
+"
+"1","In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/base.hpp:28:0,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array.hpp:21,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint/util/multi_array_adaption.hpp:29,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint.hpp:61,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr/functor/integrate_ode_rk45.hpp:13,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr.hpp:38,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/mat.hpp:298,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:12,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+"
+"1","                 from file11cc436f473.cpp:8:
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function 'static void boost::multi_array_concepts::detail::idgen_helper<N>::call(Array&, const IdxGen&, Call_Type)':
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:42:43: warning: typedef 'index_range' locally defined but not used [-Wunused-local-typedefs]
+"
+"1","       typedef typename Array::index_range index_range;
+"
+"1","                                           ^
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:43:37: warning: typedef 'index' locally defined but not used [-Wunused-local-typedefs]
+"
+"1","       typedef typename Array::index index;
+"
+"1","                                     ^
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function 'static void boost::multi_array_concepts::detail::idgen_helper<0ull>::call(Array&, const IdxGen&, Call_Type)':
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:53:43: warning: typedef 'index_range' locally defined but not used [-Wunused-local-typedefs]
+"
+"1","       typedef typename Array::index_range index_range;
+"
+"1","                                           ^
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:54:37: warning: typedef 'index' locally defined but not used [-Wunused-local-typedefs]
+"
+"1","       typedef typename Array::index index;
+"
+"1","                                     ^
+"
+"1","In file included from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:42:0,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+"
+"1","                 from file11cc436f473.cpp:8:
+"
+"1","C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp: At global scope:
+"
+"1","C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: 'void stan::math::set_zero_all_adjoints()' defined but not used [-Wunused-function]
+"
+"1","     static void set_zero_all_adjoints() {
+"
+"1","                 ^
+"
+"1","
+"
+"1","SAMPLING"
+"1"," FOR MODEL '"
+"1","log_crime ~ dnorm(mu, sigma)"
+"1","' NOW (CHAIN "
+"1","1"
+"1",").
+"
+"1","
+"
+"1","Gradient evaluation took 0 seconds"
+"1","
+"
+"1","1000 transitions using 10 leapfrog steps per transition would take 0 seconds."
+"1","
+"
+"1","Adjust your expectations accordingly!"
+"1","
+"
+"1","
+"
+"1","
+"
+"1","Iteration:    1 / 2000 [  0%]  (Warmup)"
+"1","
+"
+"1","Iteration:  200 / 2000 [ 10%]  (Warmup)"
+"1","
+"
+"1","Iteration:  400 / 2000 [ 20%]  (Warmup)"
+"1","
+"
+"1","Iteration:  600 / 2000 [ 30%]  (Warmup)"
+"1","
+"
+"1","Iteration:  800 / 2000 [ 40%]  (Warmup)"
+"1","
+"
+"1","Iteration: 1000 / 2000 [ 50%]  (Warmup)"
+"1","
+"
+"1","Iteration: 1001 / 2000 [ 50%]  (Sampling)"
+"1","
+"
+"1","Iteration: 1200 / 2000 [ 60%]  (Sampling)"
+"1","
+"
+"1","Iteration: 1400 / 2000 [ 70%]  (Sampling)"
+"1","
+"
+"1","Iteration: 1600 / 2000 [ 80%]  (Sampling)"
+"1","
+"
+"1","Iteration: 1800 / 2000 [ 90%]  (Sampling)"
+"1","
+"
+"1","Iteration: 2000 / 2000 [100%]  (Sampling)"
+"1","
+"
+"1","
+"
+"1"," Elapsed Time: 0.296 seconds (Warm-up)"
+"1","
+"
+"1","               0.251 seconds (Sampling)"
+"1","
+"
+"1","               0.547 seconds (Total)"
+"1","
+"
+"1","
+"
+"1","
+"
+"1","SAMPLING"
+"1"," FOR MODEL '"
+"1","log_crime ~ dnorm(mu, sigma)"
+"1","' NOW (CHAIN "
+"1","1"
+"1",").
+"
+"1","
+"
+"1","Gradient evaluation took 0 seconds"
+"1","
+"
+"1","1000 transitions using 10 leapfrog steps per transition would take 0 seconds."
+"1","
+"
+"1","Adjust your expectations accordingly!"
+"1","
+"
+"1","
+"
+"1","
+"
+"1","WARNING: No variance estimation is"
+"1","
+"
+"1","         performed for num_warmup < 20"
+"1","
+"
+"1","
+"
+"1","Iteration: 1 / 1 [100%]  (Sampling)"
+"1","
+"
+"1","
+"
+"1"," Elapsed Time: 0 seconds (Warm-up)"
+"1","
+"
+"1","               0.02 seconds (Sampling)"
+"1","
+"
+"1","               0.02 seconds (Total)"
+"1","
+"
+"1","
+"
+"2","There were 1 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
+http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup"
+"2","Examine the pairs() plot to diagnose sampling problems
+"
+"2","Computing WAIC
+"
+"2","Constructing posterior predictions
+"
+"1","[ 100 / 1000 ]"
+"1","[ 200 / 1000 ]"
+"1","[ 300 / 1000 ]"
+"1","[ 400 / 1000 ]"
+"1","[ 500 / 1000 ]"
+"1","[ 600 / 1000 ]"
+"1","[ 700 / 1000 ]"
+"1","[ 800 / 1000 ]"
+"1","[ 900 / 1000 ]"
+"1","[ 1000 / 1000 ]"
+"1","
+"
+"2","NAs introduced by coercion"
+"2","Warning: Variable 'score.s' contains dots '.'.
+Will attempt to remove dots internally.
+"
+"2","Warning: Variable 'Bscore.s' contains dots '.'.
+Will attempt to remove dots internally.
+"
+"2","recompiling to avoid crashing R session
+"
+"1","In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/config.hpp:39:0,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/BH/include/boost/math/tools/config.hpp:13,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/var.hpp:7,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/gevv_vvv_vari.hpp:5,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:12,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+"
+"1","                 from file11cc14b36527.cpp:8:
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: ""BOOST_NO_CXX11_RVALUE_REFERENCES"" redefined
+"
+"1"," #  define BOOST_NO_CXX11_RVALUE_REFERENCES
+"
+"1"," ^
+"
+"1","<command-line>:0:0: note: this is the location of the previous definition
+"
+"1","In file included from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/base.hpp:28:0,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array.hpp:21,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint/util/multi_array_adaption.hpp:29,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/BH/include/boost/numeric/odeint.hpp:61,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr/functor/integrate_ode_rk45.hpp:13,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/arr.hpp:38,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/prim/mat.hpp:298,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:12,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+"
+"1","                 from file11cc14b36527.cpp:8:
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function 'static void boost::multi_array_concepts::detail::idgen_helper<N>::call(Array&, const IdxGen&, Call_Type)':
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:42:43: warning: typedef 'index_range' locally defined but not used [-Wunused-local-typedefs]
+"
+"1","       typedef typename Array::index_range index_range;
+"
+"1","                                           ^
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:43:37: warning: typedef 'index' locally defined but not used [-Wunused-local-typedefs]
+"
+"1","       typedef typename Array::index index;
+"
+"1","                                     ^
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function 'static void boost::multi_array_concepts::detail::idgen_helper<0ull>::call(Array&, const IdxGen&, Call_Type)':
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:53:43: warning: typedef 'index_range' locally defined but not used [-Wunused-local-typedefs]
+"
+"1","       typedef typename Array::index_range index_range;
+"
+"1","                                           ^
+"
+"1","C:/Program Files/R/R-3.3.3/library/BH/include/boost/multi_array/concept_checks.hpp:54:37: warning: typedef 'index' locally defined but not used [-Wunused-local-typedefs]
+"
+"1","       typedef typename Array::index index;
+"
+"1","                                     ^
+"
+"1","In file included from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core.hpp:42:0,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math.hpp:4,
+"
+"1","                 from C:/Program Files/R/R-3.3.3/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
+"
+"1","                 from file11cc14b36527.cpp:8:
+"
+"1","C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp: At global scope:
+"
+"1","C:/Program Files/R/R-3.3.3/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: 'void stan::math::set_zero_all_adjoints()' defined but not used [-Wunused-function]
+"
+"1","     static void set_zero_all_adjoints() {
+"
+"1","                 ^
+"
+"1","
+"
+"1","SAMPLING"
+"1"," FOR MODEL '"
+"1","log_crime ~ dnorm(mu, sigma)"
+"1","' NOW (CHAIN "
+"1","1"
+"1",").
+"
+"1","
+"
+"1","Gradient evaluation took 0 seconds"
+"1","
+"
+"1","1000 transitions using 10 leapfrog steps per transition would take 0 seconds."
+"1","
+"
+"1","Adjust your expectations accordingly!"
+"1","
+"
+"1","
+"
+"1","
+"
+"1","Iteration:    1 / 2000 [  0%]  (Warmup)"
+"1","
+"
+"1","Iteration:  200 / 2000 [ 10%]  (Warmup)"
+"1","
+"
+"1","Iteration:  400 / 2000 [ 20%]  (Warmup)"
+"1","
+"
+"1","Iteration:  600 / 2000 [ 30%]  (Warmup)"
+"1","
+"
+"1","Iteration:  800 / 2000 [ 40%]  (Warmup)"
+"1","
+"
+"1","Iteration: 1000 / 2000 [ 50%]  (Warmup)"
+"1","
+"
+"1","Iteration: 1001 / 2000 [ 50%]  (Sampling)"
+"1","
+"
+"1","Iteration: 1200 / 2000 [ 60%]  (Sampling)"
+"1","
+"
+"1","Iteration: 1400 / 2000 [ 70%]  (Sampling)"
+"1","
+"
+"1","Iteration: 1600 / 2000 [ 80%]  (Sampling)"
+"1","
+"
+"1","Iteration: 1800 / 2000 [ 90%]  (Sampling)"
+"1","
+"
+"1","Iteration: 2000 / 2000 [100%]  (Sampling)"
+"1","
+"
+"1","
+"
+"1"," Elapsed Time: 2.173 seconds (Warm-up)"
+"1","
+"
+"1","               2.151 seconds (Sampling)"
+"1","
+"
+"1","               4.324 seconds (Total)"
+"1","
+"
+"1","
+"
+"1","
+"
+"1","SAMPLING"
+"1"," FOR MODEL '"
+"1","log_crime ~ dnorm(mu, sigma)"
+"1","' NOW (CHAIN "
+"1","1"
+"1",").
+"
+"1","
+"
+"1","Gradient evaluation took 0 seconds"
+"1","
+"
+"1","1000 transitions using 10 leapfrog steps per transition would take 0 seconds."
+"1","
+"
+"1","Adjust your expectations accordingly!"
+"1","
+"
+"1","
+"
+"1","
+"
+"1","WARNING: No variance estimation is"
+"1","
+"
+"1","         performed for num_warmup < 20"
+"1","
+"
+"1","
+"
+"1","Iteration: 1 / 1 [100%]  (Sampling)"
+"1","
+"
+"1","
+"
+"1"," Elapsed Time: 0 seconds (Warm-up)"
+"1","
+"
+"1","               0.041 seconds (Sampling)"
+"1","
+"
+"1","               0.041 seconds (Total)"
+"1","
+"
+"1","
+"
+"2","There were 1 divergent transitions after warmup. Increasing adapt_delta above 0.8 may help. See
+http://mc-stan.org/misc/warnings.html#divergent-transitions-after-warmup"
+"2","Examine the pairs() plot to diagnose sampling problems
+"
+"2","Computing WAIC
+"
+"2","Constructing posterior predictions
+"
+"1","[ 100 / 1000 ]"
+"1","[ 200 / 1000 ]"
+"1","[ 300 / 1000 ]"
+"1","[ 400 / 1000 ]"
+"1","[ 500 / 1000 ]"
+"1","[ 600 / 1000 ]"
+"1","[ 700 / 1000 ]"
+"1","[ 800 / 1000 ]"
+"1","[ 900 / 1000 ]"
+"1","[ 1000 / 1000 ]"
+"1","
+"

@@ -10,7 +10,7 @@ navbar:
     href: model.html
   - text: Model Comparison
     href: compare.html
-  - text: Shiny App
+  - text: Counterfactual Plots
 output:
   html_document:
     toc: yes

@@ -38,11 +38,12 @@ Merge datasets d1 and d2 to create prediction data.
 ```{r merge}
 # combine d1, d2
 d = merge(d1,d2)
+
 ```
 
 ### Model 1
 
-Find significant predictors of Model 1 with summary. As shown below, predictor **Bx1_c** is the most significant, and hence we will examine **the effect of movie type - "Crime-inducing"** on **log crime cases**.
+Find significant predictors of Model 1 with summary. As shown below, predictor **Bx3_c** is the most significant, and hence we will examine **the effect of movie type - "Neutral"** on **log crime cases**.
 
 ```{r m1.summary}
 summary(lm(log_crime~ Bx1_c + Bx2_c + Bx3_c, data=d1, x=T))
@@ -52,12 +53,12 @@ Plot the model-averaged predictions of this model set.
 
 ```{r m1.average}
 # Model 1
-Bx1_c.seq <- seq(from=-5.5, to=4, length.out = 30)
+Bx3_c.seq <- seq(from=-5.5, to=4, length.out = 30)
 d.predict <- list(
   log_crime = rep(0,30),
-  Bx1_c = Bx1_c.seq,
+  Bx1_c = rep(0,30),
   Bx2_c = rep(0,30),
-  Bx3_c = rep(0,30),
+  Bx3_c = Bx3_c.seq,
   log_box_office = rep(0,30),
   score.s = rep(0,30),
   Bscore.s = rep(0,30)
@@ -67,16 +68,17 @@ d.predict <- list(
   mu <- apply( pred.m , 2 , mean )
   mu.PI <- apply( pred.m , 2 , PI )
   
-  plot( log_crime ~ Bx1_c , d , col=rangi2 )
-  lines( Bx1_c.seq , mu , lty=2 )
-  lines( Bx1_c.seq, mu.PI[1,] , lty=2 )
-  lines( Bx1_c.seq , mu.PI[2,] , lty=2 )
+  plot( log_crime ~ Bx3_c , d , col=rangi2 )
+  lines( Bx3_c.seq , mu , lty=2 )
+  lines( Bx3_c.seq, mu.PI[1,] , lty=2 )
+  lines( Bx3_c.seq , mu.PI[2,] , lty=2 )
   
   log_crime.ensemble <- ensemble( m1 , m2 ,data=d.predict )
   mu <- apply( log_crime.ensemble$link , 2 , mean )
   mu.PI <- apply( log_crime.ensemble$link , 2 , PI )
-  lines( Bx1_c.seq , mu )
-  shade( mu.PI , Bx1_c.seq )
+  lines( Bx3_c.seq , mu )
+  shade( mu.PI , Bx3_c.seq )
+  
 ```
 
 ### Model 2
@@ -102,7 +104,7 @@ d.predict <- list(
   Bscore.s = rep(0,30)
 )
 
-  pred.m <- link( m1 , data=d.predict )
+  pred.m <- link( m2 , data=d.predict )
   mu <- apply( pred.m , 2 , mean )
   mu.PI <- apply( pred.m , 2 , PI )
   
