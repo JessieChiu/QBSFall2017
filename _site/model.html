@@ -288,9 +288,6 @@ div.tocify {
 <li>
   <a href="compare.html">Model Comparison</a>
 </li>
-<li>
-  <a href="plot.Rmd">Counterfactual Plots</a>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -446,10 +443,10 @@ m2.stan &lt;- map2stan(
 <p>Compare map to map2stan to check the quadratic approximation. From the table of coefficients, we can see that the numbers are approximately the same.</p>
 <pre class="r"><code>coeftab(m2, m2.stan)</code></pre>
 <pre><code>##       m2      m2.stan
-## a       15.43   15.52
-## b1      -0.24   -0.24
-## b2      -0.09   -0.04
-## b3       0.00   -0.01
+## a       15.43   15.31
+## b1      -0.24   -0.23
+## b2      -0.09   -0.12
+## b3          0       0
 ## sigma    0.13    0.14
 ## nobs       32      32</code></pre>
 <p>For the Stan model and these data, the resulting posterior distribution is quite nearly multivariate Gaussian. The density for sigma is quite skewed in a certain direction, but otherwise the quadratic approximation does almost as well as Hamiltonian Monte Carlo. Since the quadratic approximation turned out to be okay, we can continue to use map estimates.</p>
