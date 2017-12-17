@@ -11,6 +11,7 @@ navbar:
   - text: Model Comparison
     href: compare.html
   - text: Counterfactual Plots
+    href: plot.Rmd
 output:
   html_document:
     toc: yes
@@ -21,4 +22,5 @@ output:
     lib_dir: site_libs
     self_contained: no
 output_dir: _site
+exclude: ["plot.Rmd"]
 

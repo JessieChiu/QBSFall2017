@@ -24,7 +24,7 @@ source(file.path("datasets", "model.R"))
 
 It is not apparent which is the better model, since the model weights are approximately the same.
 
-We can conclude that **the effect of movie type** is as significant as a predictor as **the effect of box office results** and **the effect of movie scores** on **crime rates**.
+We can conclude that **the effect of movie type** is as significant as a predictor as **the effect of log box office results** and **the effect of movie scores** on **crime rates**.
 
 ```{r compare}
 # compare models 

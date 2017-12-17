@@ -288,7 +288,9 @@ div.tocify {
 <li>
   <a href="compare.html">Model Comparison</a>
 </li>
-<li class="dropdown-header">Counterfactual Plots</li>
+<li>
+  <a href="plot.Rmd">Counterfactual Plots</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -319,8 +321,8 @@ source(file.path(&quot;datasets&quot;, &quot;model.R&quot;))</code></pre>
 <pre class="r"><code># compare models 
 compare(m1, m2) </code></pre>
 <pre><code>##     WAIC pWAIC dWAIC weight    SE  dSE
-## m2 -32.6   4.2   0.0   0.55 10.66   NA
-## m1 -32.2   6.6   0.4   0.45 11.16 9.58</code></pre>
+## m1 -33.2   6.1   0.0    0.6 10.60   NA
+## m2 -32.4   4.3   0.8    0.4 10.65 9.28</code></pre>
 </div>
 <div id="model-averaging" class="section level2">
 <h2>Model Averaging</h2>
