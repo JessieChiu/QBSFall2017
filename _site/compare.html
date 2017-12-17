@@ -317,12 +317,12 @@ source(file.path(&quot;datasets&quot;, &quot;model.R&quot;))</code></pre>
 <div id="model-comparison" class="section level2">
 <h2>Model Comparison</h2>
 <p>It is not apparent which is the better model, since the model weights are approximately the same.</p>
-<p>We can conclude that <strong>the effect of movie type</strong> is as significant as a predictor as <strong>the effect of box office results</strong> and <strong>the effect of movie scores</strong> on <strong>crime rates</strong>.</p>
+<p>We can conclude that <strong>the effect of movie type</strong> is as significant as a predictor as <strong>the effect of log box office results</strong> and <strong>the effect of movie scores</strong> on <strong>crime rates</strong>.</p>
 <pre class="r"><code># compare models 
 compare(m1, m2) </code></pre>
 <pre><code>##     WAIC pWAIC dWAIC weight    SE  dSE
-## m1 -33.2   6.1   0.0    0.6 10.60   NA
-## m2 -32.4   4.3   0.8    0.4 10.65 9.28</code></pre>
+## m1 -32.8   6.2   0.0   0.54 10.84   NA
+## m2 -32.5   4.2   0.3   0.46 10.62 9.38</code></pre>
 </div>
 <div id="model-averaging" class="section level2">
 <h2>Model Averaging</h2>
